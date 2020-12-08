@@ -44,9 +44,9 @@
 
 function( fill_out_prefix name )
 
-  if( ${name}_PREFIX AND NOT ${name}_INCLUDE_DIR )
-    set( ${name}_INCLUDE_DIR ${${name}_PREFIX}/include PARENT_SCOPE )
-  endif()
+  #if( ${name}_PREFIX AND NOT ${name}_INCLUDE_DIR )
+  #  set( ${name}_INCLUDE_DIR ${${name}_PREFIX}/include PARENT_SCOPE )
+  #endif()
 
   if( ${name}_PREFIX AND NOT ${name}_LIBRARY_DIR )
     set( ${name}_LIBRARY_DIR 
