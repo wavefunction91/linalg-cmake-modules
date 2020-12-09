@@ -28,7 +28,7 @@ fill_out_prefix( BLAS )
 
 if( NOT BLAS_PREFERENCE_LIST )
 #  set( BLAS_PREFERENCE_LIST "IntelMKL" "IBMESSL" "BLIS" "OpenBLAS" "ReferenceBLAS" )
-  set( BLAS_PREFERENCE_LIST "IBMESSL" "BLIS" "OpenBLAS" )
+  set( BLAS_PREFERENCE_LIST "IntelMKL" "IBMESSL" "BLIS" "OpenBLAS" )
 endif()
 
 if( NOT BLAS_LIBRARIES )
