@@ -418,26 +418,29 @@ if( IntelMKL_LIBRARY AND IntelMKL_THREAD_LIBRARY AND IntelMKL_CORE_LIBRARY )
 
   endif()
 
-    list( APPEND IntelMKL_BLAS_LAPACK_LIBRARIES "m" "dl" )
 
-    if( IntelMKL_BLACS_LIBRARIES )
-      list( APPEND IntelMKL_BLACS_LIBRARIES "m" "dl" )
-    endif()
+  find_dependency( Threads )
 
-    if( IntelMKL_ScaLAPACK_LIBRARIES )
-      list( APPEND IntelMKL_ScaLAPACK_LIBRARIES "m" "dl" )
-    endif()
+  list( APPEND IntelMKL_BLAS_LAPACK_LIBRARIES "m" "dl" Threads::Threads )
+
+  if( IntelMKL_BLACS_LIBRARIES )
+    list( APPEND IntelMKL_BLACS_LIBRARIES "m" "dl" Threads::Threads )
+  endif()
+
+  if( IntelMKL_ScaLAPACK_LIBRARIES )
+    list( APPEND IntelMKL_ScaLAPACK_LIBRARIES "m" "dl" Threads::Threads )
+  endif()
 
 
 
 
-    if( IntelMKL_ScaLAPACK_LIBRARIES )
-      set( IntelMKL_LIBRARIES ${IntelMKL_ScaLAPACK_LIBRARIES} )
-    elseif( IntelMKL_BLACS_LIBRARIES )
-      set( IntelMKL_LIBRARIES ${IntelMKL_BLACS_LIBRARIES} )
-    else()
-      set( IntelMKL_LIBRARIES ${IntelMKL_BLAS_LAPACK_LIBRARIES} )
-    endif()
+  if( IntelMKL_ScaLAPACK_LIBRARIES )
+    set( IntelMKL_LIBRARIES ${IntelMKL_ScaLAPACK_LIBRARIES} )
+  elseif( IntelMKL_BLACS_LIBRARIES )
+    set( IntelMKL_LIBRARIES ${IntelMKL_BLACS_LIBRARIES} )
+  else()
+    set( IntelMKL_LIBRARIES ${IntelMKL_BLAS_LAPACK_LIBRARIES} )
+  endif()
 
 endif()
 
