@@ -42,6 +42,8 @@
 #
 #==================================================================
 
+set( COMMON_UTILITY_CMAKE_FILE_DIR ${CMAKE_CURRENT_LIST_DIR} )
+
 function( fill_out_prefix name )
 
   #if( ${name}_PREFIX AND NOT ${name}_INCLUDE_DIR )
@@ -114,5 +116,20 @@ function( get_true_target_property _out _target _property )
       set( ${_out} ${_${_target}_property} PARENT_SCOPE )
     endif()
   endif()
+
+endfunction()
+
+
+
+function( check_function_exists_w_results _libs _func _output _result )
+
+  try_compile( ${_result} ${CMAKE_CURRENT_BINARY_DIR}
+                 SOURCES ${COMMON_UTILITY_CMAKE_FILE_DIR}/func_check.c
+                 COMPILE_DEFINITIONS "-DFUNC_NAME=${_func}"
+                 LINK_LIBRARIES ${_libs} 
+                 OUTPUT_VARIABLE ${_output} )
+
+  set( ${_output} "${${_output}}" PARENT_SCOPE )
+  set( ${_result} "${${_result}}" PARENT_SCOPE )
 
 endfunction()

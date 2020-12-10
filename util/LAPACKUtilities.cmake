@@ -1,31 +1,29 @@
-set( BLAS_UTILITY_CMAKE_FILE_DIR ${CMAKE_CURRENT_LIST_DIR} )
+set( LAPACK_UTILITY_CMAKE_FILE_DIR ${CMAKE_CURRENT_LIST_DIR} )
 
+function( check_dpstrf_exists _libs _link_ok _uses_lower _uses_underscore )
 
-function( check_dgemm_exists _libs _link_ok _uses_lower _uses_underscore )
-
-include( ${BLAS_UTILITY_CMAKE_FILE_DIR}/CommonFunctions.cmake )
+include( ${LAPACK_UTILITY_CMAKE_FILE_DIR}/CommonFunctions.cmake )
 
 set( ${_link_ok} FALSE )
 set( ${_uses_lower} )
 set( ${_uses_underscore} )
 
-
 foreach( _uplo LOWER UPPER )
 
-  set( _dgemm_name_template "dgemm" )
-  string( TO${_uplo} ${_dgemm_name_template} _dgemm_name_uplo )
+  set( _dpstrf_name_template "dpstrf" )
+  string( TO${_uplo} ${_dpstrf_name_template} _dpstrf_name_uplo )
   
   foreach( _under UNDERSCORE NO_UNDERSCORE )
 
-    set( _item BLAS_${_uplo}_${_under} )
+    set( _item LAPACK_${_uplo}_${_under} )
     if( _under EQUAL "UNDERSCORE" )
-      set( _dgemm_name "${_dgemm_name_uplo}_" )
+      set( _dpstrf_name "${_dpstrf_name_uplo}_" )
     else()
-      set( _dgemm_name "${_dgemm_name_uplo}_" )
+      set( _dpstrf_name "${_dpstrf_name_uplo}_" )
     endif()
 
     check_function_exists_w_results( 
-      "${${_libs}}" ${_dgemm_name} _compile_output _compile_result 
+      "${${_libs}}" ${_dpstrf_name} _compile_output _compile_result 
     )
 
     message( STATUS "Performing Test ${_item}" )
@@ -39,19 +37,30 @@ foreach( _uplo LOWER UPPER )
 
     else()
 
-      # Check for GFORTRAN
-      if( _compile_output MATCHES "gfortran" )
+      #message( STATUS ${_compile_output} )
 
-        message( STATUS "  * Mising GFORTRAN - Adding TO BLAS LINKER" )
+      # Check for GFORTRAN
+      if( _compile_output MATCHES "_gfortran" )
+
+        message( STATUS "  * Mising GFORTRAN - Adding TO LAPACK LINKER" )
 
         list( APPEND ${_libs} "gfortran" )
         set( ${_libs} ${${_libs}} PARENT_SCOPE )
 
       endif()
 
+      if( _compile_output MATCHES "logf" )
+
+        message( STATUS "  * Mising LIBM - Adding TO LAPACK LINKER" )
+
+        list( APPEND ${_libs} "m" )
+        set( ${_libs} ${${_libs}} PARENT_SCOPE )
+
+      endif()
+
       # Recheck Compiliation
       check_function_exists_w_results( 
-        "${${_libs}}" ${_dgemm_name} _compile_output _compile_result 
+        "${${_libs}}" ${_dpstrf_name} _compile_output _compile_result 
       )
 
       if( _compile_result )
@@ -72,8 +81,8 @@ foreach( _uplo LOWER UPPER )
     break()
   endif()
 
-  unset( _dgemm_name_template )
-  unset( _dgemm_name_uplo     )
+  unset( _dpstrf_name_template )
+  unset( _dpstrf_name_uplo     )
 endforeach() 
 
 #cmake_pop_check_state()
@@ -88,18 +97,17 @@ endfunction()
 
 
 
-
-
-function( check_blas_int _libs _dgemm_name _libs_are_lp64 )
+function( check_lapack_int _libs _dsyev_name _libs_are_lp64 )
 
 try_run( _run_result _compile_result ${CMAKE_CURRENT_BINARY_DIR}
-  SOURCES        ${BLAS_UTILITY_CMAKE_FILE_DIR}/ilp64_checker.c
+  SOURCES        ${LAPACK_UTILITY_CMAKE_FILE_DIR}/lapack_ilp64_checker.c
   LINK_LIBRARIES ${${_libs}}
-  COMPILE_DEFINITIONS "-DDGEMM_NAME=${_dgemm_name}"
+  COMPILE_DEFINITIONS "-DDSYEV_NAME=${_dsyev_name}"
   COMPILE_OUTPUT_VARIABLE _compile_output
   RUN_OUTPUT_VARIABLE     _run_output
 )
 
+#message( STATUS ${_run_result} )
 
 if( ${_run_result} EQUAL 0 )
   set( ${_libs_are_lp64} TRUE PARENT_SCOPE )
