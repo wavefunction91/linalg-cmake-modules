@@ -424,11 +424,11 @@ if( IntelMKL_LIBRARY AND IntelMKL_THREAD_LIBRARY AND IntelMKL_CORE_LIBRARY )
   list( APPEND IntelMKL_BLAS_LAPACK_LIBRARIES "m" "dl" Threads::Threads )
 
   if( IntelMKL_BLACS_LIBRARIES )
-    list( APPEND IntelMKL_BLACS_LIBRARIES "m" "dl" Threads::Threads )
+    list( APPEND IntelMKL_BLACS_LIBRARIES "m" "dl" Threads::Threads MPI::MPI_C )
   endif()
 
   if( IntelMKL_ScaLAPACK_LIBRARIES )
-    list( APPEND IntelMKL_ScaLAPACK_LIBRARIES "m" "dl" Threads::Threads )
+    list( APPEND IntelMKL_ScaLAPACK_LIBRARIES "m" "dl" Threads::Threads MPI::MPI_C )
   endif()
 
 

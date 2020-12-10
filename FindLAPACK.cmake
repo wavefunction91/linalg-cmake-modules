@@ -57,6 +57,8 @@ if( NOT LAPACK_LIBRARIES )
     message( STATUS "BLAS Has A Full LAPACK Linker" )
     set( LAPACK_VENDOR  ${BLAS_VENDOR}  )
     set( LAPACK_IS_LP64 ${BLAS_IS_LP64} )
+    set( LAPACK_blacs_FOUND ${BLAS_blacs_FOUND} )
+    set( LAPACK_scalapack_FOUND ${BLAS_scalapack_FOUND} )
 
   # Else find LAPACK installation consistent with BLAS
   else( BLAS_HAS_LAPACK )
@@ -87,6 +89,11 @@ if( NOT LAPACK_LIBRARIES )
         list( PREPEND LAPACK_COMPILE_DEFINITIONS ${${lapack_type}_COMPILE_DEFINITIONS} )
         list( PREPEND LAPACK_INCLUDE_DIR         ${${lapack_type}_INCLUDE_DIR}         )
 
+        # Generic Components
+        #set( LAPACK_headers_FOUND   ${${lapack_type}_headers_FOUND}   )
+        set( LAPACK_blacs_FOUND     ${${lapack_type}_blacs_FOUND}     )
+        set( LAPACK_scalapack_FOUND ${${lapack_type}_scalapack_FOUND} )
+
         break() # Break from search loop
 
       endif()
@@ -104,9 +111,13 @@ endif()
 
 
 # Check for LAPACK Linker
-check_dpstrf_exists( LAPACK_LIBRARIES 
-  LAPACK_LINK_OK LAPACK_FORTRAN_LOWER LAPACK_FORTRAN_UNDERSCORE
-)
+if( BLAS_HAS_LAPACK )
+  set( LAPACK_LINK_OK TRUE )
+else()
+  check_dpstrf_exists( LAPACK_LIBRARIES 
+    LAPACK_LINK_OK LAPACK_FORTRAN_LOWER LAPACK_FORTRAN_UNDERSCORE
+  )
+endif()
 
 # If LAPACK linkage sucessful, check if it is ILP64/LP64
 if( LAPACK_LINK_OK )
