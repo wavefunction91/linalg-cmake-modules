@@ -1,5 +1,17 @@
 set( BLAS_UTILITY_CMAKE_FILE_DIR ${CMAKE_CURRENT_LIST_DIR} )
 
+function( check_function_exists_w_results _libs _func _output _result )
+
+  try_compile( ${_result} ${CMAKE_CURRENT_BINARY_DIR}
+                 SOURCES ${BLAS_UTILITY_CMAKE_FILE_DIR}/blas_check.c
+                 COMPILE_DEFINITIONS "-DFUNC_NAME=${_func}"
+                 LINK_LIBRARIES ${_libs} 
+                 OUTPUT_VARIABLE ${_output} )
+
+  set( ${_output} "${${_output}}" PARENT_SCOPE )
+  set( ${_result} "${${_result}}" PARENT_SCOPE )
+
+endfunction()
 
 function( check_dgemm_exists _libs _link_ok _uses_lower _uses_underscore )
 
@@ -11,12 +23,12 @@ set( ${_link_ok} FALSE )
 set( ${_uses_lower} )
 set( ${_uses_underscore} )
 
-cmake_push_check_state( RESET )
-
-if( ${_libs} )
-  set( CMAKE_REQUIRED_LIBRARIES ${${_libs}} )
-endif()
-set( CMAKE_REQUIRED_QUIET ON )
+#cmake_push_check_state( RESET )
+#
+#if( ${_libs} )
+#  set( CMAKE_REQUIRED_LIBRARIES ${${_libs}} )
+#endif()
+#set( CMAKE_REQUIRED_QUIET ON )
 
 foreach( _uplo LOWER UPPER )
 
@@ -32,19 +44,46 @@ foreach( _uplo LOWER UPPER )
       set( _dgemm_name "${_dgemm_name_uplo}_" )
     endif()
 
-    check_library_exists( "" ${_dgemm_name} "" ${_item} )
-
-    unset( _dgemm_name )
+    check_function_exists_w_results( 
+      "${${_libs}}" ${_dgemm_name} _compile_output _compile_result 
+    )
 
     message( STATUS "Performing Test ${_item}" )
-    if( ${_item} )
+    if( _compile_result )
+
       message( STATUS "Performing Test ${_item} -- found" )
       set( ${_link_ok} TRUE )
       string( COMPARE EQUAL "${_uplo}"  "LOWER"      ${_uses_lower}      )
       string( COMPARE EQUAL "${_under}" "UNDERSCORE" ${_uses_underscore} )
       break()
+
     else()
-      message( STATUS "Performing Test ${_item} -- not found" )
+
+      # Check for GFORTRAN
+      if( _compile_output MATCHES "gfortran" )
+
+        message( STATUS "  * Mising GFORTRAN - Adding TO BLAS LINKER" )
+
+        list( APPEND ${_libs} "gfortran" )
+        set( ${_libs} ${${_libs}} PARENT_SCOPE )
+
+      endif()
+
+      # Recheck Compiliation
+      check_function_exists_w_results( 
+        "${${_libs}}" ${_dgemm_name} _compile_output _compile_result 
+      )
+
+      if( _compile_result )
+        message( STATUS "Performing Test ${_item} -- found" )
+        set( ${_link_ok} TRUE )
+        string( COMPARE EQUAL "${_uplo}"  "LOWER"      ${_uses_lower}      )
+        string( COMPARE EQUAL "${_under}" "UNDERSCORE" ${_uses_underscore} )
+        break()
+      else()
+        message( STATUS "Performing Test ${_item} -- not found" )
+      endif()
+
     endif()
 
   endforeach()
@@ -57,7 +96,7 @@ foreach( _uplo LOWER UPPER )
   unset( _dgemm_name_uplo     )
 endforeach() 
 
-cmake_pop_check_state()
+#cmake_pop_check_state()
 
 
 set( ${_link_ok}         ${${_link_ok}}         PARENT_SCOPE )
@@ -80,6 +119,7 @@ try_run( _run_result _compile_result ${CMAKE_CURRENT_BINARY_DIR}
   COMPILE_OUTPUT_VARIABLE _compile_output
   RUN_OUTPUT_VARIABLE     _run_output
 )
+
 
 if( ${_run_result} EQUAL 0 )
   set( ${_libs_are_lp64} TRUE PARENT_SCOPE )

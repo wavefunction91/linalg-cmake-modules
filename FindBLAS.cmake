@@ -27,8 +27,7 @@ endforeach()
 fill_out_prefix( BLAS )
 
 if( NOT BLAS_PREFERENCE_LIST )
-#  set( BLAS_PREFERENCE_LIST "IntelMKL" "IBMESSL" "BLIS" "OpenBLAS" "ReferenceBLAS" )
-  set( BLAS_PREFERENCE_LIST "IntelMKL" "IBMESSL" "BLIS" "OpenBLAS" )
+  set( BLAS_PREFERENCE_LIST "IntelMKL" "IBMESSL" "BLIS" "OpenBLAS" "ReferenceBLAS" )
 endif()
 
 if( NOT BLAS_LIBRARIES )
@@ -88,7 +87,6 @@ if( BLAS_LINK_OK )
   if( BLAS_FORTRAN_UNDERSCORE )
     set( _dgemm_name "${_dgemm_name}_" )
   endif()
-
 
   check_blas_int( BLAS_LIBRARIES ${_dgemm_name} BLAS_IS_LP64 )
   if( BLAS_IS_LP64 )
