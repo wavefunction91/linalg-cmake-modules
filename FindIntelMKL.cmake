@@ -1,10 +1,6 @@
 #    FindIntelMKL.cmake
 #
-#    Finds Intel(R) MKL and exports its linkange as
-#    CMake TARGETS
-#
-#    This module is meant to serve as part of FindLinAlg.
-#    It can also be used by itself.
+#    Finds Intel(R) MKL
 #
 #    The module will define the following variables:
 #    
@@ -12,13 +8,11 @@
 #      IntelMKL_INCLUDE_DIR - Location of MKL headers (mkl.h)
 #      IntelMKL_LIBRARIES   - MKL libraries
 #
-#    This module will export the following CMake TARGETS if possible
+#    The find behaviour of the module can be influenced by the following
 #
-#      IntelMKL::mkl
-#
-#      intelmkl_PREFERS_STATIC          - default OFF
-#      intelmkl_THREAD_LAYER   - ( sequential, openmp, tbb ) default: openmp
-#      intelmkl_THREAD_LIBRARY - ( intel, gnu, pgi )         default: depends on compiler
+#      IntelMKL_PREFERS_STATIC - default OFF
+#      IntelMKL_THREAD_LAYER   - ( sequential, openmp, tbb ) default: openmp
+#      IntelMKL_OMP_LIBRARY    - ( Intel, GNU, PGI )         default: depends on compiler
 
 
 include( CMakeFindDependencyMacro )
