@@ -3,8 +3,10 @@ if( "ilp64" IN_LIST ReferenceScaLAPACK_FIND_COMPONENTS AND "lp64" IN_LIST Refere
   message( FATAL_ERROR "ReferenceScaLAPACK cannot link to both ILP64 and LP64 iterfaces" )
 endif()
 
-enable_language(C)
-find_dependency( MPI )
+if( NOT TARGET MPI::MPI_C )
+  enable_language(C)
+  find_dependency( MPI )
+endif()
 
 if( ReferenceScaLAPACK_PREFERS_STATIC )
   set( ReferenceScaLAPACK_LP64_LIBRARY_NAME  "libscalapack.a"   )

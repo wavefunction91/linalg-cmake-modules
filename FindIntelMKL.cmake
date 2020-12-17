@@ -100,7 +100,9 @@ else()
   if( NOT IntelMKL_OMP_LIBRARY )
 
     include( ${CMAKE_CURRENT_LIST_DIR}/util/IntrospectOpenMP.cmake )
-    find_dependency( OpenMP )
+    if( NOT TARGET OpenMP::OpenMP_C )
+      find_dependency( OpenMP )
+    endif()
     check_openmp_is_gnu( OpenMP::OpenMP_C OMP_IS_GNU )
 
     if( OMP_IS_GNU )
@@ -133,7 +135,9 @@ endif()
 # MKL MPI for BLACS
 if( "blacs" IN_LIST IntelMKL_FIND_COMPONENTS )
 
-  find_dependency( MPI )
+  if( NOT TARGET MPI::MPI_C )
+    find_dependency( MPI )
+  endif()
 
   if( NOT IntelMPI_MPI_LIBRARY )
     include( ${CMAKE_CURRENT_LIST_DIR}/util/IntrospectMPI.cmake )
@@ -398,7 +402,10 @@ if( IntelMKL_LIBRARY AND IntelMKL_THREAD_LIBRARY AND IntelMKL_CORE_LIBRARY )
 
   elseif( IntelMKL_THREAD_LAYER MATCHES "tbb" )
 
-    find_dependency( TBB )
+    if( NOT TARGET tbb )
+      message( FATAL_ERROR "TBB Bindings Not Currently Accessible Through FindIntelMKL" )
+      find_dependency( TBB )
+    endif()
 
     list( APPEND IntelMKL_BLAS_LAPACK_LIBRARIES tbb )
 
@@ -413,7 +420,9 @@ if( IntelMKL_LIBRARY AND IntelMKL_THREAD_LIBRARY AND IntelMKL_CORE_LIBRARY )
   endif()
 
 
-  find_dependency( Threads )
+  if( NOT TARGET Threads::Threads )
+    find_dependency( Threads )
+  endif()
 
   list( APPEND IntelMKL_BLAS_LAPACK_LIBRARIES "m" "dl" Threads::Threads )
 
