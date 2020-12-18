@@ -1,4 +1,4 @@
-cmake_minimum_required( VERSION 3.11 ) # Require CMake 3.11+
+cmake_minimum_required( VERSION 3.17 ) # Require CMake 3.17+
 
 include( CMakePushCheckState )
 include( CheckLibraryExists )
@@ -49,8 +49,8 @@ if( NOT BLAS_LIBRARIES )
       set( BLAS_VENDOR              "${blas_type}"                        )
       set( BLAS_LIBRARIES           "${${blas_type}_LIBRARIES}"           )
       set( BLAS_COMPILE_DEFINITIONS "${${blas_type}_COMPILE_DEFINITIONS}" )
-      set( BLAS_INCLUDE_DIR         "${${blas_type}_INCLUDE_DIR}"         )
-
+      set( BLAS_INCLUDE_DIRS        "${${blas_type}_INCLUDE_DIR}"         )
+      set( BLAS_COMPILE_OPTIONS     "${${blas_type}_C_COMPILE_FLAGS}"     )
 
       # Generic Components
       #set( BLAS_headers_FOUND   ${${blas_type}_headers_FOUND}   )
@@ -110,6 +110,8 @@ if( BLAS_FOUND AND NOT TARGET BLAS::BLAS )
   
   add_library( BLAS::BLAS INTERFACE IMPORTED )
   set_target_properties( BLAS::BLAS PROPERTIES
+    INTERFACE_INCLUDE_DIRECTORIES "${BLAS_INCLUDE_DIRS}"
+    INTERFACE_COMPILE_OPTIONS     "${BLAS_COMPILE_OPTIONS}"
     INTERFACE_COMPILE_DEFINITIONS "${BLAS_COMPILE_DEFINITIONS}"
     INTERFACE_LINK_LIBRARIES      "${BLAS_LIBRARIES}"
   )

@@ -9,6 +9,8 @@ else()
   set( BLIS_LIBRARY_NAME "blis" )
 endif()
 
+set( BLIS_PREFIX ${BLISROOT} $ENV{BLISROOT} )
+
 find_library( BLIS_LIBRARIES
   NAMES ${BLIS_LIBRARY_NAME}
   HINTS ${BLIS_PREFIX}
@@ -25,11 +27,10 @@ find_path( BLIS_INCLUDE_DIR
   DOC "BLIS header"
 )
   
-#if( BLIS_LIBRARY AND BLIS_PREFERS_STATIC )
-#  include( CMakeFindDependency )
-#  find_package( Threads QUIET )
-#  set( BLIS_LIBRARIES ${BLIS_LIBRARY} Threads::Threads "m")
-#endif()
+if( BLIS_LIBRARIES )
+ find_package( Threads QUIET )
+ set( BLIS_LIBRARIES ${BLIS_LIBRARIES} Threads::Threads "m")
+endif()
 
 # check ILP64
 if( BLIS_INCLUDE_DIR )

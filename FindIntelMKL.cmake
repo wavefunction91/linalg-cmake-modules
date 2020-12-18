@@ -67,6 +67,11 @@ else()
   set( IntelMKL_ILP64_SGIMPT_BLACS_LIBRARY_NAME   "mkl_blacs_sgimpt_ilp64"   )
 endif()
 
+if( IntelMKL_PREFERS_STATIC AND ENABLE_DPCPP)
+  set( IntelMKL_SYCL_LIBRARY_NAME       "libmkl_sycl.a"         )
+elseif(ENABLE_DPCPP)
+  set( IntelMKL_SYCL_LIBRARY_NAME       "mkl_sycl"              )
+endif()
 
 # Defaults
 if( NOT IntelMKL_THREAD_LAYER )
@@ -78,7 +83,7 @@ if( NOT IntelMKL_MPI_LIBRARY )
 endif()
 
 if( NOT IntelMKL_PREFIX )
-  set( IntelMKL_PREFIX $ENV{MKLROOT} )
+  set( IntelMKL_PREFIX ${MKLROOT} $ENV{MKLROOT} )
 endif()
 
 
@@ -193,8 +198,6 @@ find_library( IntelMKL_CORE_LIBRARY
   DOC "Intel(R) MKL CORE Library"
 )
 
-
-
 # Check version
 if( EXISTS ${IntelMKL_INCLUDE_DIR}/mkl_version.h )
   set( version_pattern 
@@ -253,6 +256,16 @@ else()
   set( IntelMKL_lp64_FOUND FALSE )
 endif()
 
+# SYCL
+if(ENABLE_DPCPP)
+  find_library( Intelmkl_SYCL_LIBRARY
+    NAMES ${IntelMKL_SYCL_LIBRARY_NAME}
+    HINTS ${Intelmkl_PREFIX}
+    PATHS ${Intelmkl_LIBRARY_DIR} ${CMAKE_C_IMPLICIT_LINK_DIRECTORIES}
+    PATH_SUFFIXES lib/intel64 lib/ia32
+    DOC "Intel(R) MKL SYCL Library"
+  )
+endif() 
 
 
 # BLACS / ScaLAPACK
@@ -343,7 +356,8 @@ if( IntelMKL_LIBRARY AND IntelMKL_THREAD_LIBRARY AND IntelMKL_CORE_LIBRARY )
   set( IntelMKL_BLAS_LAPACK_LIBRARIES
        ${IntelMKL_LIBRARY} 
        ${IntelMKL_THREAD_LIBRARY} 
-       ${IntelMKL_CORE_LIBRARY} )
+       ${IntelMKL_CORE_LIBRARY}
+       ${Intelmkl_SYCL_LIBRARY})
 
   if( "blacs" IN_LIST IntelMKL_FIND_COMPONENTS )
     set( IntelMKL_BLACS_LIBRARIES 
