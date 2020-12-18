@@ -9,7 +9,9 @@ else()
   set( BLIS_LIBRARY_NAME "blis" )
 endif()
 
-set( BLIS_PREFIX ${BLISROOT} $ENV{BLISROOT} )
+if( NOT BLIS_PREFIX )
+  set( BLIS_PREFIX ${BLISROOT} $ENV{BLISROOT} )
+endif()
 
 find_library( BLIS_LIBRARIES
   NAMES ${BLIS_LIBRARY_NAME}
