@@ -11,7 +11,9 @@ else()
   set( ReferenceLAPACK_ILP64_LIBRARY_NAME "lapack64" )
 endif()
 
-set( ReferenceLAPACK_PREFIX ${ReferenceLAPACKROOT} $ENV{ReferenceLAPACKROOT} )
+if( NOT ReferenceLAPACK_PREFIX )
+  set( ReferenceLAPACK_PREFIX ${ReferenceLAPACKROOT} $ENV{ReferenceLAPACKROOT} )
+endif()
 
 find_library( ReferenceLAPACK_LP64_LIBRARIES
   NAMES ${ReferenceLAPACK_LP64_LIBRARY_NAME}
