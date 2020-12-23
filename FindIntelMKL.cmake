@@ -36,6 +36,7 @@ if( IntelMKL_PREFERS_STATIC )
   set( IntelMKL_OMP_PGI_LIBRARY_NAME    "libmkl_pgi_thread.a"   )
   set( IntelMKL_TBB_LIBRARY_NAME        "libmkl_tbb_thread.a"   )
   set( IntelMKL_CORE_LIBRARY_NAME       "libmkl_core.a"         )
+  set( IntelMKL_SYCL_LIBRARY_NAME       "libmkl_sycl.a"         )
 
   set( IntelMKL_LP64_ScaLAPACK_LIBRARY_NAME  "libmkl_scalapack_lp64.a"  )
   set( IntelMKL_ILP64_ScaLAPACK_LIBRARY_NAME "libmkl_scalapack_ilp64.a" )
@@ -55,6 +56,7 @@ else()
   set( IntelMKL_OMP_PGI_LIBRARY_NAME    "mkl_pgi_thread"   )
   set( IntelMKL_TBB_LIBRARY_NAME        "mkl_tbb_thread"   )
   set( IntelMKL_CORE_LIBRARY_NAME       "mkl_core"         )
+  set( IntelMKL_SYCL_LIBRARY_NAME       "mkl_sycl"         )
 
   set( IntelMKL_LP64_ScaLAPACK_LIBRARY_NAME  "mkl_scalapack_lp64"  )
   set( IntelMKL_ILP64_ScaLAPACK_LIBRARY_NAME "mkl_scalapack_ilp64" )
@@ -67,11 +69,6 @@ else()
   set( IntelMKL_ILP64_SGIMPT_BLACS_LIBRARY_NAME   "mkl_blacs_sgimpt_ilp64"   )
 endif()
 
-if( IntelMKL_PREFERS_STATIC AND ENABLE_DPCPP)
-  set( IntelMKL_SYCL_LIBRARY_NAME       "libmkl_sycl.a"         )
-elseif(ENABLE_DPCPP)
-  set( IntelMKL_SYCL_LIBRARY_NAME       "mkl_sycl"              )
-endif()
 
 # Defaults
 if( NOT IntelMKL_THREAD_LAYER )
@@ -257,11 +254,11 @@ else()
 endif()
 
 # SYCL
-if(ENABLE_DPCPP)
-  find_library( Intelmkl_SYCL_LIBRARY
+if( "sycl" IN_LIST IntelMKL_FIND_COMPONENTS )
+  find_library( IntelMKL_SYCL_LIBRARY
     NAMES ${IntelMKL_SYCL_LIBRARY_NAME}
-    HINTS ${Intelmkl_PREFIX}
-    PATHS ${Intelmkl_LIBRARY_DIR} ${CMAKE_C_IMPLICIT_LINK_DIRECTORIES}
+    HINTS ${IntelMKL_PREFIX}
+    PATHS ${IntelMKL_LIBRARY_DIR} ${CMAKE_C_IMPLICIT_LINK_DIRECTORIES}
     PATH_SUFFIXES lib/intel64 lib/ia32
     DOC "Intel(R) MKL SYCL Library"
   )
@@ -360,8 +357,11 @@ if( IntelMKL_LIBRARY AND IntelMKL_THREAD_LIBRARY AND IntelMKL_CORE_LIBRARY )
   set( IntelMKL_BLAS_LAPACK_LIBRARIES
        ${IntelMKL_LIBRARY} 
        ${IntelMKL_THREAD_LIBRARY} 
-       ${IntelMKL_CORE_LIBRARY}
-       ${Intelmkl_SYCL_LIBRARY})
+       ${IntelMKL_CORE_LIBRARY} )
+  
+  if( "sycl" IN_LIST IntelMKL_FIND_COMPONENTS )
+    list( APPEND  IntelMKL_BLAS_LAPACK_LIBRARIES ${IntelMKL_SYCL_LIBRARY} )
+  endif()
 
   if( "blacs" IN_LIST IntelMKL_FIND_COMPONENTS )
     set( IntelMKL_BLACS_LIBRARIES 
