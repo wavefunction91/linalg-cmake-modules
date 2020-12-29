@@ -30,9 +30,6 @@ find_path( BLIS_INCLUDE_DIR
 )
   
 if( BLIS_LIBRARIES )
-  if(CMAKE_HOST_SYSTEM_NAME MATCHES Darwin)
-   set(THREADS_PREFER_PTHREAD_FLAG ON)
-  endif()
   find_package( Threads QUIET )
   set( BLIS_LIBRARIES ${BLIS_LIBRARIES} Threads::Threads "m")
 endif()
