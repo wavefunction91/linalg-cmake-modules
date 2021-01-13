@@ -1,4 +1,4 @@
-cmake_minimum_required( VERSION 3.11 ) # Require CMake 3.11+
+cmake_minimum_required( VERSION 3.17 ) # Require CMake 3.17+
 
 include( CMakePushCheckState )
 include( CheckLibraryExists )
@@ -8,7 +8,8 @@ include( FindPackageHandleStandardArgs )
 
 
 include( ${CMAKE_CURRENT_LIST_DIR}/util/CommonFunctions.cmake )
-include( ${CMAKE_CURRENT_LIST_DIR}/util/LAPACKUtilities.cmake   )
+include( ${CMAKE_CURRENT_LIST_DIR}/util/LAPACKUtilities.cmake )
+include( ${CMAKE_CURRENT_LIST_DIR}/LinAlgModulesMacros.cmake  )
 
 # SANITY CHECK
 if( "ilp64" IN_LIST LAPACK_FIND_COMPONENTS AND "lp64" IN_LIST LAPACK_FIND_COMPONENTS )
@@ -44,7 +45,7 @@ if( NOT LAPACK_LIBRARIES )
   # Check if BLAS contains a LAPACK linker
   message( STATUS "LAPACK_LIBRARIES Not Given: Checking for LAPACK in BLAS" )
   set( LAPACK_LIBRARIES           ${BLAS_LIBRARIES}           )
-  set( LAPACK_INCLUDE_DIR         ${BLAS_INCLUDE_DIR}         )
+  set( LAPACK_INCLUDE_DIRS        ${BLAS_INCLUDE_DIRS}        )
   set( LAPACK_COMPILE_DEFINITIONS ${BLAS_COMPILE_DEFINITIONS} )
   check_dpstrf_exists( LAPACK_LIBRARIES 
     BLAS_HAS_LAPACK LAPACK_FORTRAN_LOWER LAPACK_FORTRAN_UNDERSCORE
@@ -101,7 +102,8 @@ if( NOT LAPACK_LIBRARIES )
     endforeach()
   endif( BLAS_HAS_LAPACK )
 
-
+else()
+  find_linalg_dependencies( LAPACK_LIBRARIES )
 endif()
 
 # Handle implicit LAPACK linkage

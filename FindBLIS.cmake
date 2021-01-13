@@ -25,11 +25,10 @@ find_path( BLIS_INCLUDE_DIR
   DOC "BLIS header"
 )
   
-#if( BLIS_LIBRARY AND BLIS_PREFERS_STATIC )
-#  include( CMakeFindDependency )
-#  find_package( Threads QUIET )
-#  set( BLIS_LIBRARIES ${BLIS_LIBRARY} Threads::Threads "m")
-#endif()
+if( BLIS_LIBRARIES )
+  find_package( Threads QUIET )
+  set( BLIS_LIBRARIES ${BLIS_LIBRARIES} Threads::Threads "m")
+endif()
 
 # check ILP64
 if( BLIS_INCLUDE_DIR )

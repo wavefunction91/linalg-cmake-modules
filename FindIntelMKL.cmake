@@ -36,6 +36,7 @@ if( IntelMKL_PREFERS_STATIC )
   set( IntelMKL_OMP_PGI_LIBRARY_NAME    "libmkl_pgi_thread.a"   )
   set( IntelMKL_TBB_LIBRARY_NAME        "libmkl_tbb_thread.a"   )
   set( IntelMKL_CORE_LIBRARY_NAME       "libmkl_core.a"         )
+  set( IntelMKL_SYCL_LIBRARY_NAME       "libmkl_sycl.a"         )
 
   set( IntelMKL_LP64_ScaLAPACK_LIBRARY_NAME  "libmkl_scalapack_lp64.a"  )
   set( IntelMKL_ILP64_ScaLAPACK_LIBRARY_NAME "libmkl_scalapack_ilp64.a" )
@@ -55,6 +56,7 @@ else()
   set( IntelMKL_OMP_PGI_LIBRARY_NAME    "mkl_pgi_thread"   )
   set( IntelMKL_TBB_LIBRARY_NAME        "mkl_tbb_thread"   )
   set( IntelMKL_CORE_LIBRARY_NAME       "mkl_core"         )
+  set( IntelMKL_SYCL_LIBRARY_NAME       "mkl_sycl"         )
 
   set( IntelMKL_LP64_ScaLAPACK_LIBRARY_NAME  "mkl_scalapack_lp64"  )
   set( IntelMKL_ILP64_ScaLAPACK_LIBRARY_NAME "mkl_scalapack_ilp64" )
@@ -193,8 +195,6 @@ find_library( IntelMKL_CORE_LIBRARY
   DOC "Intel(R) MKL CORE Library"
 )
 
-
-
 # Check version
 if( EXISTS ${IntelMKL_INCLUDE_DIR}/mkl_version.h )
   set( version_pattern 
@@ -253,6 +253,16 @@ else()
   set( IntelMKL_lp64_FOUND FALSE )
 endif()
 
+# SYCL
+if( "sycl" IN_LIST IntelMKL_FIND_COMPONENTS )
+  find_library( IntelMKL_SYCL_LIBRARY
+    NAMES ${IntelMKL_SYCL_LIBRARY_NAME}
+    HINTS ${IntelMKL_PREFIX}
+    PATHS ${IntelMKL_LIBRARY_DIR} ${CMAKE_C_IMPLICIT_LINK_DIRECTORIES}
+    PATH_SUFFIXES lib/intel64 lib/ia32
+    DOC "Intel(R) MKL SYCL Library"
+  )
+endif() 
 
 
 # BLACS / ScaLAPACK
@@ -296,11 +306,16 @@ if( "ilp64" IN_LIST IntelMKL_FIND_COMPONENTS )
   set( IntelMKL_COMPILE_DEFINITIONS "MKL_ILP64" )
   if( CMAKE_C_COMPILER_ID MATCHES "GNU" )
     set( IntelMKL_C_COMPILE_FLAGS        "-m64" )
+  endif()
+  if( CMAKE_Fortran_COMPILER_ID MATCHES "GNU" )
     set( IntelMKL_Fortran_COMPILE_FLAGS  "-m64" "-fdefault-integer-8" )
+  elseif( CMAKE_Fortran_COMPILER_ID MATCHES "Flang" )
+    set( IntelMKL_Fortran_COMPILE_FLAGS  "-fdefault-integer-8" )
   elseif( CMAKE_C_COMPILER_ID MATCHES "PGI" )
     set( IntelMKL_Fortran_COMPILE_FLAGS "-i8" )
   endif()
   set( IntelMKL_LIBRARY ${IntelMKL_ILP64_LIBRARY} )
+  set( IntelMKL_COMPILE_OPTIONS ${IntelMKL_C_COMPILE_FLAGS} )
 
   if( IntelMKL_ILP64_BLACS_LIBRARY )
     set( IntelMKL_BLACS_LIBRARY ${IntelMKL_ILP64_BLACS_LIBRARY} )
@@ -326,7 +341,9 @@ else()
   endif()
 endif()
 
-
+if( IntelMKL_SYCL_LIBRARY )
+  set( IntelMKL_sycl_FOUND TRUE )
+endif()
 
 
 
@@ -344,6 +361,10 @@ if( IntelMKL_LIBRARY AND IntelMKL_THREAD_LIBRARY AND IntelMKL_CORE_LIBRARY )
        ${IntelMKL_LIBRARY} 
        ${IntelMKL_THREAD_LIBRARY} 
        ${IntelMKL_CORE_LIBRARY} )
+
+  if( "sycl" IN_LIST IntelMKL_FIND_COMPONENTS )
+    list( APPEND IntelMKL_BLAS_LAPACK_LIBRARIES ${IntelMKL_SYCL_LIBRARY} )
+  endif()
 
   if( "blacs" IN_LIST IntelMKL_FIND_COMPONENTS )
     set( IntelMKL_BLACS_LIBRARIES 
