@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        linalg_lib: [blis,openblas,netlib]
+        linalg_lib: [blis,openblas,netlib,intel-mkl]
         int_interface: [lp64,ilp64]
         thread: [serial,openmp,pthreads]
         exclude:
@@ -20,6 +20,10 @@ jobs:
             thread: pthreads
           - linalg_lib: netlib
             thread: openmp
+          - linalg_lib: intel-mkl
+            thread: pthreads
+          - linalg_lib: intel-mkl
+            thread: serial # TODO Renable once naming conventions are worked out
 
     steps:
     - uses: actions/checkout@v2
