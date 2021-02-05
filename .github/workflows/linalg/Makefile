@@ -45,24 +45,28 @@ install/clang: install/clang-${clang_version}
 
 
 # MPICH
-download/mpich:
-	mkdir -p ${software_prefix}/src/mpich
-	cd ${software_prefix}/src/mpich && wget --no-check-certificate -q http://www.mpich.org/static/downloads/${mpich_version}/mpich-${mpich_version}.tar.gz
-	cd ${software_prefix}/src/mpich && tar xzf mpich-${mpich_version}.tar.gz
-
+#download/mpich:
+#	mkdir -p ${software_prefix}/src/mpich
+#	cd ${software_prefix}/src/mpich && wget --no-check-certificate -q http://www.mpich.org/static/downloads/${mpich_version}/mpich-${mpich_version}.tar.gz
+#	cd ${software_prefix}/src/mpich && tar xzf mpich-${mpich_version}.tar.gz
+#
+#install/mpich:
+#	cd ${software_prefix}/src/mpich/mpich-${mpich_version} && CC=gcc CXX=g++ FC=gfortran ./configure --prefix=${software_prefix}/install/mpich
+#	make -C ${software_prefix}/src/mpich/mpich-${mpich_version} install
 install/mpich:
-	cd ${software_prefix}/src/mpich/mpich-${mpich_version} && CC=gcc CXX=g++ FC=gfortran ./configure --prefix=${software_prefix}/install/mpich
-	make -C ${software_prefix}/src/mpich/mpich-${mpich_version} install
+	apt-get install -yq libmpich-dev
 
 # OpenMPI
-download/openmpi:
-	mkdir -p ${software_prefix}/src/openmpi
-	cd ${software_prefix}/src/openmpi && wget --no-check-certificate -qi https://download.open-mpi.org/release/open-mpi/v4.1/openmpi-4.1.0.tar.gz 
-	cd ${software_prefix}/src/openmpi && tar xzf openmpi-${openmpi_version}.tar.gz
-
+#download/openmpi:
+#	mkdir -p ${software_prefix}/src/openmpi
+#	cd ${software_prefix}/src/openmpi && wget --no-check-certificate -qi https://download.open-mpi.org/release/open-mpi/v4.1/openmpi-4.1.0.tar.gz 
+#	cd ${software_prefix}/src/openmpi && tar xzf openmpi-${openmpi_version}.tar.gz
+#
+#install/openmpi:
+#	cd ${software_prefix}/src/openmpi/openmpi-${openmpi_version} && CC=gcc CXX=g++ FC=gfortran ./configure --prefix=${software_prefix}/install/openmpi
+#	make -C ${software_prefix}/src/openmpi/openmpi-${openmpi_version} install
 install/openmpi:
-	cd ${software_prefix}/src/openmpi/openmpi-${openmpi_version} && CC=gcc CXX=g++ FC=gfortran ./configure --prefix=${software_prefix}/install/openmpi
-	make -C ${software_prefix}/src/openmpi/openmpi-${openmpi_version} install
+	apt-get install -yq libopenmpi-dev openmpi-bin
 
 
 
