@@ -106,7 +106,7 @@ find_package_handle_standard_args( BLAS
 )
 
 # Cache variables
-set( BLAS_LIBRARIES "${BLAS_LIBRARIES}" CACHE INTERNAL "BLAS Libraries" FORCE )
+set( BLAS_LIBRARIES "${BLAS_LIBRARIES}" CACHE STRING "BLAS Libraries" FORCE )
 
 if( BLAS_FOUND AND NOT TARGET BLAS::BLAS )
   
