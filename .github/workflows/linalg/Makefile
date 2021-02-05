@@ -57,12 +57,12 @@ install/intel-mkl:
 	ln -s /opt/intel/compilers_and_libraries_$(subst -,.,${intel_mkl_version})/linux/mkl /opt/intel/mkl
 	test -x /opt/intel/mkl/bin/mklvars.sh
 
-install/intel-mkl-lp64-serial:  install/intel-mkl
-install/intel-mkl-lp64-openmp:  install/intel-mkl
-install/intel-mkl-lp64-tbb:     install/intel-mkl
-install/intel-mkl-ilp64-serial: install/intel-mkl
-install/intel-mkl-ilp64-openmp: install/intel-mkl
-install/intel-mkl-ilp64-tbb:    install/intel-mkl
+install/intel-mkl/lp64-sequential:  install/intel-mkl
+install/intel-mkl/lp64-openmp:  install/intel-mkl
+install/intel-mkl/lp64-tbb:     install/intel-mkl
+install/intel-mkl/ilp64-sequential: install/intel-mkl
+install/intel-mkl/ilp64-openmp: install/intel-mkl
+install/intel-mkl/ilp64-tbb:    install/intel-mkl
 
 
 # BLIS
@@ -77,8 +77,8 @@ install/blis/lp64-pthreads:
 install/blis/lp64-openmp:
 	cd ${software_prefix}/src/blis/blis-0.8.0 && CC=gcc ./configure -p ${software_prefix}/install/blis-lp64-openmp -t openmp -i 32 -b 32 --enable-blas auto
 	make -C ${software_prefix}/src/blis/blis-0.8.0 install
-install/blis/lp64-serial:
-	cd ${software_prefix}/src/blis/blis-0.8.0 && CC=gcc ./configure -p ${software_prefix}/install/blis-lp64-serial -t no -i 32 -b 32 --enable-blas auto
+install/blis/lp64-sequential:
+	cd ${software_prefix}/src/blis/blis-0.8.0 && CC=gcc ./configure -p ${software_prefix}/install/blis-lp64-sequential -t no -i 32 -b 32 --enable-blas auto
 	make -C ${software_prefix}/src/blis/blis-0.8.0 install
 
 install/blis/ilp64-pthreads:
@@ -87,8 +87,8 @@ install/blis/ilp64-pthreads:
 install/blis/ilp64-openmp:
 	cd ${software_prefix}/src/blis/blis-0.8.0 && CC=gcc ./configure -p ${software_prefix}/install/blis-ilp64-openmp -t openmp -i 64 -b 64 --enable-blas auto
 	make -C ${software_prefix}/src/blis/blis-0.8.0 install
-install/blis/ilp64-serial:
-	cd ${software_prefix}/src/blis/blis-0.8.0 && CC=gcc ./configure -p ${software_prefix}/install/blis-ilp64-serial -t no -i 64 -b 64 --enable-blas auto
+install/blis/ilp64-sequential:
+	cd ${software_prefix}/src/blis/blis-0.8.0 && CC=gcc ./configure -p ${software_prefix}/install/blis-ilp64-sequential -t no -i 64 -b 64 --enable-blas auto
 	make -C ${software_prefix}/src/blis/blis-0.8.0 install
 
 # OpenBLAS
@@ -97,10 +97,10 @@ download/openblas:
 	cd ${software_prefix}/src/openblas && wget https://github.com/xianyi/OpenBLAS/releases/download/v0.3.13/OpenBLAS-0.3.13.tar.gz
 	cd ${software_prefix}/src/openblas && tar xzf OpenBLAS-0.3.13.tar.gz
 
-install/openblas/lp64-serial:
+install/openblas/lp64-sequential:
 	make -C ${software_prefix}/src/openblas/OpenBLAS-0.3.13 clean
 	BINARY64=1 USE_THREAD=0 CC=gcc FC=gfortran NO_CBLAS=1 NO_LAPACKE=1 make -C ${software_prefix}/src/openblas/OpenBLAS-0.3.13
-	make -C ${software_prefix}/src/openblas/OpenBLAS-0.3.13 PREFIX=${software_prefix}/install/openblas-lp64-serial  install
+	make -C ${software_prefix}/src/openblas/OpenBLAS-0.3.13 PREFIX=${software_prefix}/install/openblas-lp64-sequential  install
 install/openblas/lp64-pthreads:
 	make -C ${software_prefix}/src/openblas/OpenBLAS-0.3.13 clean
 	BINARY64=1 USE_THREAD=1 CC=gcc FC=gfortran NO_CBLAS=1 NO_LAPACKE=1 make -C ${software_prefix}/src/openblas/OpenBLAS-0.3.13
@@ -110,10 +110,10 @@ install/openblas/lp64-openmp:
 	BINARY64=1 USE_OPENMP=1 CC=gcc FC=gfortran NO_CBLAS=1 NO_LAPACKE=1 make -C ${software_prefix}/src/openblas/OpenBLAS-0.3.13
 	make -C ${software_prefix}/src/openblas/OpenBLAS-0.3.13 PREFIX=${software_prefix}/install/openblas-lp64-openmp  install
 
-install/openblas/ilp64-serial:
+install/openblas/ilp64-sequential:
 	make -C ${software_prefix}/src/openblas/OpenBLAS-0.3.13 clean
 	BINARY64=1 INTERFACE64=1 USE_THREAD=0 CC=gcc FC=gfortran NO_CBLAS=1 NO_LAPACKE=1 make -C ${software_prefix}/src/openblas/OpenBLAS-0.3.13
-	make -C ${software_prefix}/src/openblas/OpenBLAS-0.3.13 PREFIX=${software_prefix}/install/openblas-ilp64-serial  install
+	make -C ${software_prefix}/src/openblas/OpenBLAS-0.3.13 PREFIX=${software_prefix}/install/openblas-ilp64-sequential  install
 install/openblas/ilp64-pthreads:
 	make -C ${software_prefix}/src/openblas/OpenBLAS-0.3.13 clean
 	BINARY64=1 INTERFACE64=1 USE_THREAD=1 CC=gcc FC=gfortran NO_CBLAS=1 NO_LAPACKE=1 make -C ${software_prefix}/src/openblas/OpenBLAS-0.3.13
@@ -129,13 +129,13 @@ download/netlib:
 	cd ${software_prefix}/src/netlib && wget https://github.com/Reference-LAPACK/lapack/archive/v3.9.0.tar.gz
 	cd ${software_prefix}/src/netlib && tar xzf v3.9.0.tar.gz
 
-install/netlib/lp64-serial-static:
-	rm -fr ${software_prefix}/build/netlib-lp64-serial
-	cmake -H${software_prefix}/src/netlib/lapack-3.9.0 -B${software_prefix}/build/netlib-lp64-serial -DCMAKE_INSTALL_PREFIX=${software_prefix}/install/netlib-lp64-serial
-	cmake --build ${software_prefix}/build/netlib-lp64-serial --target install
-install/netlib/lp64-serial-shared:
-	rm -fr ${software_prefix}/build/netlib-lp64-serial
-	cmake -H${software_prefix}/src/netlib/lapack-3.9.0 -B${software_prefix}/build/netlib-lp64-serial -DBUILD_SHARED_LIBS=ON -DCMAKE_INSTALL_PREFIX=${software_prefix}/install/netlib-lp64-serial
-	cmake --build ${software_prefix}/build/netlib-lp64-serial --target install
+install/netlib/lp64-sequential-static:
+	rm -fr ${software_prefix}/build/netlib-lp64-sequential
+	cmake -H${software_prefix}/src/netlib/lapack-3.9.0 -B${software_prefix}/build/netlib-lp64-sequential -DCMAKE_INSTALL_PREFIX=${software_prefix}/install/netlib-lp64-sequential
+	cmake --build ${software_prefix}/build/netlib-lp64-sequential --target install
+install/netlib/lp64-sequential-shared:
+	rm -fr ${software_prefix}/build/netlib-lp64-sequential
+	cmake -H${software_prefix}/src/netlib/lapack-3.9.0 -B${software_prefix}/build/netlib-lp64-sequential -DBUILD_SHARED_LIBS=ON -DCMAKE_INSTALL_PREFIX=${software_prefix}/install/netlib-lp64-sequential
+	cmake --build ${software_prefix}/build/netlib-lp64-sequential --target install
 
-install/netlib/lp64-serial: install/netlib/lp64-serial-static install/netlib/lp64-serial-shared
+install/netlib/lp64-sequential: install/netlib/lp64-sequential-static install/netlib/lp64-sequential-shared
