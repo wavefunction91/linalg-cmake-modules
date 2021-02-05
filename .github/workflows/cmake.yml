@@ -30,7 +30,8 @@ jobs:
 
     - name: Ubuntu Setup
       run: |
-           ls /usr/lib/x86_64-linux-gnu/ | grep blas
+           apt list --installed | grep blas
+           apt list --installed | grep lapack
            sudo apt-get -yq update && sudo apt-get install make wget curl libomp5
            sudo make -C .github/workflows/linalg install/main
            sudo make -C .github/workflows/linalg install/cmake
