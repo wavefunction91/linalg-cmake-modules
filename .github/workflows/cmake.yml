@@ -6,7 +6,7 @@ env:
   MKLROOT: /opt/intel/mkl
 
 jobs:
-  linux-build:
+  linux-check-all-libs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -44,6 +44,15 @@ jobs:
         CMAKE_PREFIX_PATH: /home/software/install/${{matrix.linalg_lib}}-${{matrix.int_interface}}-${{matrix.thread}} 
       run: |
         cmake -H${GITHUB_WORKSPACE}/examples/blas/default \
-              -B${{runner.workspace}}/build-findblas \
+              -B${{runner.workspace}}/build-findblas-default \
+              -DCMAKE_MODULE_PATH=${GITHUB_WORKSPACE} \
+              -DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}
+
+    - name: FindBLAS Integer Specific
+      env:
+        CMAKE_PREFIX_PATH: /home/software/install/${{matrix.linalg_lib}}-${{matrix.int_interface}}-${{matrix.thread}} 
+      run: |
+        cmake -H${GITHUB_WORKSPACE}/examples/blas/${{matrix.int_interface}} \
+              -B${{runner.workspace}}/build-findblas-${{matrix.int_interface}} \
               -DCMAKE_MODULE_PATH=${GITHUB_WORKSPACE} \
               -DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}

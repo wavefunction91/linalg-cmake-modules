@@ -57,6 +57,13 @@ install/intel-mkl:
 	ln -s /opt/intel/compilers_and_libraries_$(subst -,.,${intel_mkl_version})/linux/mkl /opt/intel/mkl
 	test -x /opt/intel/mkl/bin/mklvars.sh
 
+install/intel-mkl-lp64-serial:  install/intel-mkl
+install/intel-mkl-lp64-openmp:  install/intel-mkl
+install/intel-mkl-lp64-tbb:     install/intel-mkl
+install/intel-mkl-ilp64-serial: install/intel-mkl
+install/intel-mkl-ilp64-openmp: install/intel-mkl
+install/intel-mkl-ilp64-tbb:    install/intel-mkl
+
 
 # BLIS
 download/blis:
