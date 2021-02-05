@@ -37,31 +37,24 @@ jobs:
            sudo make -C .github/workflows/linalg install/cmake
            sudo apt-get clean
            sudo make -C .github/workflows/linalg apt-add-repository/intel-mkl
-           ls /usr/lib/x86_64-linux-gnu/ | grep blas
 
     - name: Setup MPI
       run: |
-           ls /usr/lib/x86_64-linux-gnu/ | grep blas
            sudo make -C .github/workflows/linalg install/${{matrix.mpi_dist}}
-           ls /usr/lib/x86_64-linux-gnu/ | grep blas
 
 
     - name: Build Linalg
       env:
         BUILD_TARGET: ${{matrix.linalg_lib}}/${{matrix.int_interface}}-${{matrix.thread}} 
       run: |
-           ls /usr/lib/x86_64-linux-gnu/ | grep blas
            sudo make -C .github/workflows/linalg download/${{matrix.linalg_lib}} 
            sudo make -C .github/workflows/linalg install/${BUILD_TARGET}
-           ls /usr/lib/x86_64-linux-gnu/ | grep blas
 
     - name: Add-On NETLIB
       if: ${{ matrix.linalg_lib != 'intel-mkl' && matrix.linalg_lib != 'netlib' && matrix.int_interface == 'lp64' }} 
       run: |
-           ls /usr/lib/x86_64-linux-gnu/ | grep blas
            sudo make -C .github/workflows/linalg download/netlib
            sudo make -C .github/workflows/linalg install/netlib/lp64-sequential
-           ls /usr/lib/x86_64-linux-gnu/ | grep blas
 
 
 
@@ -73,23 +66,20 @@ jobs:
 
     - name: FindBLAS Default
       run: |
-           ls /usr/lib/x86_64-linux-gnu/
            cmake -H${GITHUB_WORKSPACE}/examples/blas/default \
                  -B${{runner.workspace}}/build-findblas-default \
                  -DCMAKE_MODULE_PATH=${GITHUB_WORKSPACE} \
                  -DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH} \
                  -DIntelMKL_THREAD_LAYER=${{matrix.thread}}
-           ls /usr/lib/x86_64-linux-gnu/
+           cmake -L ${{runner.workspace}}/build-findblas-default
 
     - name: FindBLAS Integer Specific
       run: |
-           ls /usr/lib/x86_64-linux-gnu/
            cmake -H${GITHUB_WORKSPACE}/examples/blas/${{matrix.int_interface}} \
                  -B${{runner.workspace}}/build-findblas-${{matrix.int_interface}} \
                  -DCMAKE_MODULE_PATH=${GITHUB_WORKSPACE} \
                  -DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH} \
                  -DIntelMKL_THREAD_LAYER=${{matrix.thread}}
-           ls /usr/lib/x86_64-linux-gnu/
 
 
 
