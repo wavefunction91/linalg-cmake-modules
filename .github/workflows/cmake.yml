@@ -30,7 +30,7 @@ jobs:
            sudo make -C .github/workflows/linalg install/main
            sudo make -C .github/workflows/linalg install/cmake
            sudo apt-get clean
-           sudo make apt-add-repository/intel-mkl
+           sudo make -C .github/workflows/linalg apt-add-repository/intel-mkl
 
     - name: Build Linalg
       env:
