@@ -147,19 +147,27 @@ install/openblas/ilp64-openmp:
 	BINARY64=1 INTERFACE64=1 USE_OPENMP=1 CC=gcc FC=gfortran NO_CBLAS=1 NO_LAPACKE=1 make -C ${software_prefix}/src/openblas/OpenBLAS-0.3.13
 	make -C ${software_prefix}/src/openblas/OpenBLAS-0.3.13 PREFIX=${software_prefix}/install/openblas-ilp64-openmp  install
 
-# NETLIB == NETLIB-LAPACK b/c it includes NETLIB-BLAS
+# NETLIB == NETLIB-ScaLAPACK b/c it includes NETLIB-BLAS/LAPACK
 download/netlib:
 	mkdir -p ${software_prefix}/src/netlib
-	cd ${software_prefix}/src/netlib && wget https://github.com/Reference-LAPACK/lapack/archive/v3.9.0.tar.gz
-	cd ${software_prefix}/src/netlib && tar xzf v3.9.0.tar.gz
+	cd ${software_prefix}/src/netlib && wget https://github.com/Reference-ScaLAPACK/scalapack/archive/v2.1.0.tar.gz
+	cd ${software_prefix}/src/netlib && tar xzf v2.1.0.tar.gz
 
 install/netlib/lp64-sequential-static:
 	rm -fr ${software_prefix}/build/netlib-lp64-sequential
-	cmake -H${software_prefix}/src/netlib/lapack-3.9.0 -B${software_prefix}/build/netlib-lp64-sequential -DCMAKE_INSTALL_PREFIX=${software_prefix}/install/netlib-lp64-sequential
+	cmake -H${software_prefix}/src/netlib/scalapack-2.1.0 \
+              -B${software_prefix}/build/netlib-lp64-sequential \
+	      -DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH} \
+              -DCMAKE_INSTALL_PREFIX=${software_prefix}/install/netlib-lp64-sequential
 	cmake --build ${software_prefix}/build/netlib-lp64-sequential --target install
+
 install/netlib/lp64-sequential-shared:
 	rm -fr ${software_prefix}/build/netlib-lp64-sequential
-	cmake -H${software_prefix}/src/netlib/lapack-3.9.0 -B${software_prefix}/build/netlib-lp64-sequential -DBUILD_SHARED_LIBS=ON -DCMAKE_INSTALL_PREFIX=${software_prefix}/install/netlib-lp64-sequential
+	cmake -H${software_prefix}/src/netlib/scalapack-2.1.0 \
+              -B${software_prefix}/build/netlib-lp64-sequential \
+	      -DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH} \
+              -DBUILD_SHARED_LIBS=ON \
+              -DCMAKE_INSTALL_PREFIX=${software_prefix}/install/netlib-lp64-sequential
 	cmake --build ${software_prefix}/build/netlib-lp64-sequential --target install
 
 install/netlib/lp64-sequential: install/netlib/lp64-sequential-static install/netlib/lp64-sequential-shared

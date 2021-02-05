@@ -46,13 +46,13 @@ jobs:
            sudo make -C .github/workflows/linalg download/${{matrix.linalg_lib}} 
            sudo make -C .github/workflows/linalg install/${BUILD_TARGET}
 
-    #- name: Build MPI
-    #  run: |
-    #       make -C .github/workflows/linalg download/${{matrix.mpi_dist}}
-    #       make -C .github/workflows/linalg install/${{matrix.mpi_dist}}
+    - name: Build MPI
+      run: |
+           make -C .github/workflows/linalg download/${{matrix.mpi_dist}}
+           make -C .github/workflows/linalg install/${{matrix.mpi_dist}}
 
     - name: Add-On NETLIB
-      if: ${{ matrix.linalg_lib != 'intel-mkl' && matrix.int_interface == 'lp64' }} 
+      if: ${{ matrix.linalg_lib != 'intel-mkl' && matrix.linalg_lib != 'netlib' && matrix.int_interface == 'lp64' }} 
       run: |
            make -C .github/workflows/linalg download/netlib
            make -C .github/workflows/linalg install/netlib/lp64-sequential
