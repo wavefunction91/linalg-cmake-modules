@@ -2,14 +2,17 @@ name: CMake
 
 on: [pull_request]
 
+env:
+  MKLROOT: /opt/intel/mkl
+
 jobs:
   linux-build:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        thread: [serial,openmp,pthreads]
         linalg_lib: [blis,openblas,netlib]
         int_interface: [lp64,ilp64]
+        thread: [serial,openmp,pthreads]
         exclude:
           - linalg_lib: netlib
             int_interface: ilp64
@@ -26,6 +29,8 @@ jobs:
            sudo apt-get -yq update && sudo apt-get install make wget curl libomp5
            sudo make -C .github/workflows/linalg install/main
            sudo make -C .github/workflows/linalg install/cmake
+           sudo apt-get clean
+           sudo make apt-add-repository/intel-mkl
 
     - name: Build Linalg
       env:
@@ -33,3 +38,12 @@ jobs:
       run: |
            sudo make -C .github/workflows/linalg download/${{matrix.linalg_lib}} 
            sudo make -C .github/workflows/linalg install/${BUILD_TARGET}
+
+    - name: FindBLAS Default
+      env:
+        CMAKE_PREFIX_PATH: /home/software/install/${{matrix.linalg_lib}}-${{matrix.int_interface}}-${{matrix.thread}} 
+      run: |
+        cmake -H${GITHUB_WORKSPACE}/examples/blas \
+              -B${{runner.workspace}}/build-findblas \
+              -DCMAKE_MODULE_PATH=${GITHUB_WORKSPACE} \
+              -DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}
