@@ -12,10 +12,9 @@ jobs:
         int_interface: [lp64,ilp64]
         exclude:
           - linalg_lib: netlib
-          - int_interface: ilp64
-        exclude:
+            int_interface: ilp64
           - linalg_lib: netlib
-          - thread: [openmp,pthreads]
+            thread: [openmp,pthreads]
 
     steps:
     - uses: actions/checkout@v2
