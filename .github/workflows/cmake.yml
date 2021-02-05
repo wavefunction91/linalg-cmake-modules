@@ -23,10 +23,8 @@ jobs:
             thread: pthreads
     env:
       MKLROOT: /opt/intel/mkl
-      NETLIB_PREFIX: /home/software/install/netlib-lp64-sequential
-      LINALG_PREFIX: /home/software/install/${{matrix.linalg_lib}}-${{matrix.int_interface}}-${{matrix.thread}}
       #MPI_PREFIX: /home/software/install/${{matrix.mpi_dist}}
-      CMAKE_PREFIX_PATH: '${LINALG_PREFIX};${NETLIB_PREFIX}'
+      CMAKE_PREFIX_PATH: '/home/software/install/${{matrix.linalg_lib}}-${{matrix.int_interface}}-${{matrix.thread}};/home/software/install/netlib-lp64-sequential'
 
     steps:
     - uses: actions/checkout@v2
