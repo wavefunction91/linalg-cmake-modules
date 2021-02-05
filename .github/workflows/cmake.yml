@@ -39,7 +39,7 @@ jobs:
            sudo apt-get clean
            sudo make -C .github/workflows/linalg apt-add-repository/intel-mkl
 
-    - name: Build MPI
+    - name: Setup MPI
       run: |
            sudo make -C .github/workflows/linalg install/${{matrix.mpi_dist}}
 
@@ -67,6 +67,7 @@ jobs:
 
     - name: FindBLAS Default
       run: |
+        echo ${CMAKE_PREFIX_PATH}
         cmake -H${GITHUB_WORKSPACE}/examples/blas/default \
               -B${{runner.workspace}}/build-findblas-default \
               -DCMAKE_MODULE_PATH=${GITHUB_WORKSPACE} \
