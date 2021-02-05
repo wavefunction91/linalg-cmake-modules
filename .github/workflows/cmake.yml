@@ -71,7 +71,7 @@ jobs:
                  -DCMAKE_MODULE_PATH=${GITHUB_WORKSPACE} \
                  -DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH} \
                  -DIntelMKL_THREAD_LAYER=${{matrix.thread}}
-           cmake -N -L ${{runner.workspace}}/build-findblas-default
+           cmake -N -LA ${{runner.workspace}}/build-findblas-default
 
     - name: FindBLAS Integer Specific
       run: |
