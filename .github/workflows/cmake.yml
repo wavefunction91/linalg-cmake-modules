@@ -21,13 +21,13 @@ jobs:
 
     - name: Ubuntu Setup
       run: |
-           apt-get -yq update && apt-get install make wget curl
-           make -C .github/workflows/linalg install/main
-           make -C .github/workflows/linalg install/cmake
+           sudo apt-get -yq update && sudo apt-get install make wget curl
+           sudo make -C .github/workflows/linalg install/main
+           sudo make -C .github/workflows/linalg install/cmake
 
     - name: Build Linalg
       env:
         BUILD_TARGET: ${{matrix.linalg_lib}}/${{matrix.int_interface}}-${{matrix.thread}} 
       run: |
-           make -C .github/workflows/linalg download/${{matrix.linalg_lib}} 
-           make -C .github/workflows/linalg install/${BUILD_TARGET}
+           sudo make -C .github/workflows/linalg download/${{matrix.linalg_lib}} 
+           sudo make -C .github/workflows/linalg install/${BUILD_TARGET}
