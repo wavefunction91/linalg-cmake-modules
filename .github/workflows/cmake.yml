@@ -25,7 +25,7 @@ jobs:
       MKLROOT: /opt/intel/mkl
       NETLIB_PREFIX: /home/software/install/netlib-lp64-sequential
       LINALG_PREFIX: /home/software/install/${{matrix.linalg_lib}}-${{matrix.int_interface}}-${{matrix.thread}}
-      #MPI_PREFIX: /home/software/install/${{matrix.mpi_dist}}
+      MPI_PREFIX: /home/software/install/${{matrix.mpi_dist}}
       CMAKE_PREFIX_PATH: '${LINALG_PREFIX};${NETLIB_PREFIX};${MPI_PREFIX}'
 
     steps:
