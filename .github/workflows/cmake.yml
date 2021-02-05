@@ -21,7 +21,7 @@ jobs:
 
     - name: Ubuntu Setup
       run: |
-           sudo apt-get -yq update && sudo apt-get install make wget curl
+           sudo apt-get -yq update && sudo apt-get install make wget curl libomp5
            sudo make -C .github/workflows/linalg install/main
            sudo make -C .github/workflows/linalg install/cmake
 
