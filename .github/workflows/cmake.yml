@@ -30,8 +30,8 @@ jobs:
 
     - name: Ubuntu Setup
       run: |
-           apt list --installed | grep blas
-           apt list --installed | grep lapack
+           sudo apt-get remove libblas-dev libblas3 libgslcblas0
+           sudo apt-get remove liblapack-dev liblapack3 
            sudo apt-get -yq update && sudo apt-get install make wget curl libomp5
            sudo make -C .github/workflows/linalg install/main
            sudo make -C .github/workflows/linalg install/cmake
