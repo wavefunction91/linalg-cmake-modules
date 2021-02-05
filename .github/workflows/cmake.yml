@@ -58,14 +58,14 @@ jobs:
               -DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}
 
     - name: Add-On LAPACK
-      if: ${{ matrix.linalg_lib == "blis" && matrix.int_interface == "lp64" }} # Only add NETLIB LAPACK for BLIS for now, OpenBLAS, etc already have it
+      if: ${{ matrix.linalg_lib == 'blis' && matrix.int_interface == 'lp64' }} # Only add NETLIB LAPACK for BLIS for now, OpenBLAS, etc already have it
       run: make -C .github/workflows/linalg install/netlib/lp64-serial
 
 
     - name: FindLAPACK Default
-      if: ${{ matrix.linalg_lib != "blis" || matrix.int_interface != "ilp64" }}
+      if: ${{ matrix.linalg_lib != 'blis' || matrix.int_interface != 'ilp64' }}
       env:
-        CMAKE_PREFIX_PATH: "/home/software/install/${{matrix.linalg_lib}}-${{matrix.int_interface}}-${{matrix.thread}};/home/software/install/netlib-lp64-serial" 
+        CMAKE_PREFIX_PATH: '/home/software/install/${{matrix.linalg_lib}}-${{matrix.int_interface}}-${{matrix.thread}};/home/software/install/netlib-lp64-serial' 
       run: |
         cmake -H${GITHUB_WORKSPACE}/examples/lapack/default \
               -B${{runner.workspace}}/build-findlapack-default \
