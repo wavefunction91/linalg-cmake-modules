@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 export dist_name=$1
 export thread_name=$2
