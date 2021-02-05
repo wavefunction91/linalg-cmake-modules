@@ -43,7 +43,7 @@ jobs:
       env:
         CMAKE_PREFIX_PATH: /home/software/install/${{matrix.linalg_lib}}-${{matrix.int_interface}}-${{matrix.thread}} 
       run: |
-        cmake -H${GITHUB_WORKSPACE}/examples/blas \
+        cmake -H${GITHUB_WORKSPACE}/examples/blas/default \
               -B${{runner.workspace}}/build-findblas \
               -DCMAKE_MODULE_PATH=${GITHUB_WORKSPACE} \
               -DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}
