@@ -1,5 +1,7 @@
 ubuntu_codename ?= $(shell lsb_release -sc)
 clang_version ?= 9
+mpich_version ?= 3.3
+openmpi_version ?= 4.1.0
 software_prefix := /home/software
 
 export DEBIAN_FRONTEND=noninteractive
@@ -40,6 +42,28 @@ install/clang-%:
 	apt-get -yq install clang-$*
 
 install/clang: install/clang-${clang_version}
+
+
+# MPICH
+download/mpich:
+	mkdir -p ${software_prefix}/src/mpich
+	cd ${software_prefix}/src/mpich && wget --no-check-certificate -q http://www.mpich.org/static/downloads/${mpich_version}/mpich-${mpich_version}.tar.gz
+	cd ${software_prefix}/src/mpich && tar xzf mpich-${mpich_version}.tar.gz
+
+install/mpich:
+	cd ${software_prefix}/src/mpich/mpich-${mpich_version} && CC=gcc CXX=g++ FC=gfortran ./configure --prefix=${software_prefix}/install/mpich
+	make -C ${software_prefix}/src/mpich/mpich-${mpich_version} install
+
+# OpenMPI
+download/openmpi:
+	mkdir -p ${software_prefix}/src/openmpi
+	cd ${software_prefix}/src/openmpi && wget --no-check-certificate -qi https://download.open-mpi.org/release/open-mpi/v4.1/openmpi-4.1.0.tar.gz 
+	cd ${software_prefix}/src/openmpi && tar xzf openmpi-${openmpi_version}.tar.gz
+
+install/openmpi:
+	cd ${software_prefix}/src/openmpi/openmpi-${openmpi_version} && CC=gcc CXX=g++ FC=gfortran ./configure --prefix=${software_prefix}/install/openmpi
+	make -C ${software_prefix}/src/openmpi/openmpi-${openmpi_version} install
+
 
 
 # Intel

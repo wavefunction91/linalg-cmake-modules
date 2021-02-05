@@ -2,8 +2,6 @@ name: CMake
 
 on: [pull_request]
 
-env:
-  MKLROOT: /opt/intel/mkl
 
 jobs:
   linux-check-all-libs:
@@ -11,6 +9,7 @@ jobs:
     strategy:
       matrix:
         linalg_lib: [blis,openblas,netlib,intel-mkl]
+        #mpi_dist: [mpich]
         int_interface: [lp64,ilp64]
         thread: [sequential,openmp,pthreads]
         exclude:
@@ -22,6 +21,12 @@ jobs:
             thread: openmp
           - linalg_lib: intel-mkl
             thread: pthreads
+    env:
+      MKLROOT: /opt/intel/mkl
+      NETLIB_PREFIX: /home/software/install/netlib-lp64-sequential
+      LINALG_PREFIX: /home/software/install/${{matrix.linalg_lib}}-${{matrix.int_interface}}-${{matrix.thread}}
+      #MPI_PREFIX: /home/software/install/${{matrix.mpi_dist}}
+      CMAKE_PREFIX_PATH: '${LINALG_PREFIX};${NETLIB_PREFIX};${MPI_PREFIX}'
 
     steps:
     - uses: actions/checkout@v2
@@ -41,9 +46,26 @@ jobs:
            sudo make -C .github/workflows/linalg download/${{matrix.linalg_lib}} 
            sudo make -C .github/workflows/linalg install/${BUILD_TARGET}
 
+    #- name: Build MPI
+    #  run: |
+    #       make -C .github/workflows/linalg download/${{matrix.mpi_dist}}
+    #       make -C .github/workflows/linalg install/${{matrix.mpi_dist}}
+
+    - name: Add-On NETLIB
+      if: ${{ matrix.linalg_lib != 'intel-mkl' && matrix.int_interface == 'lp64' }} 
+      run: |
+           make -C .github/workflows/linalg download/netlib
+           make -C .github/workflows/linalg install/netlib/lp64-sequential
+
+
+
+
+
+
+
+
+
     - name: FindBLAS Default
-      env:
-        CMAKE_PREFIX_PATH: /home/software/install/${{matrix.linalg_lib}}-${{matrix.int_interface}}-${{matrix.thread}} 
       run: |
         cmake -H${GITHUB_WORKSPACE}/examples/blas/default \
               -B${{runner.workspace}}/build-findblas-default \
@@ -52,8 +74,6 @@ jobs:
               -DIntelMKL_THREAD_LAYER=${{matrix.thread}}
 
     - name: FindBLAS Integer Specific
-      env:
-        CMAKE_PREFIX_PATH: /home/software/install/${{matrix.linalg_lib}}-${{matrix.int_interface}}-${{matrix.thread}} 
       run: |
         cmake -H${GITHUB_WORKSPACE}/examples/blas/${{matrix.int_interface}} \
               -B${{runner.workspace}}/build-findblas-${{matrix.int_interface}} \
@@ -61,17 +81,10 @@ jobs:
               -DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH} \
               -DIntelMKL_THREAD_LAYER=${{matrix.thread}}
 
-    - name: Add-On LAPACK
-      if: ${{ matrix.linalg_lib == 'blis' && matrix.int_interface == 'lp64' }} # Only add NETLIB LAPACK for BLIS for now, OpenBLAS, etc already have it
-      run: |
-           make -C .github/workflows/linalg download/netlib
-           make -C .github/workflows/linalg install/netlib/lp64-sequential
 
 
     - name: FindLAPACK Default
       if: ${{ matrix.linalg_lib != 'blis' || matrix.int_interface != 'ilp64' }}
-      env:
-        CMAKE_PREFIX_PATH: '/home/software/install/${{matrix.linalg_lib}}-${{matrix.int_interface}}-${{matrix.thread}};/home/software/install/netlib-lp64-sequential' 
       run: |
         cmake -H${GITHUB_WORKSPACE}/examples/lapack/default \
               -B${{runner.workspace}}/build-findlapack-default \
@@ -81,8 +94,6 @@ jobs:
 
     - name: FindLAPACK Integer Specific
       if: ${{ matrix.linalg_lib != 'blis' || matrix.int_interface != 'ilp64' }}
-      env:
-        CMAKE_PREFIX_PATH: '/home/software/install/${{matrix.linalg_lib}}-${{matrix.int_interface}}-${{matrix.thread}};/home/software/install/netlib-lp64-sequential' 
       run: |
         cmake -H${GITHUB_WORKSPACE}/examples/lapack/${{matrix.int_interface}} \
               -B${{runner.workspace}}/build-findlapack-${{matrix.int_interface}} \
@@ -90,5 +101,3 @@ jobs:
               -DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH} \
               -DIntelMKL_THREAD_LAYER=${{matrix.thread}}
 
-
-    
