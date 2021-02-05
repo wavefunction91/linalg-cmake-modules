@@ -59,7 +59,9 @@ jobs:
 
     - name: Add-On LAPACK
       if: ${{ matrix.linalg_lib == 'blis' && matrix.int_interface == 'lp64' }} # Only add NETLIB LAPACK for BLIS for now, OpenBLAS, etc already have it
-      run: make -C .github/workflows/linalg install/netlib/lp64-serial
+      run: |
+           make -C .github/workflows/linalg download/netlib
+           make -C .github/workflows/linalg install/netlib/lp64-serial
 
 
     - name: FindLAPACK Default
