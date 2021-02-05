@@ -14,7 +14,9 @@ jobs:
           - linalg_lib: netlib
             int_interface: ilp64
           - linalg_lib: netlib
-            thread: [openmp,pthreads]
+            thread: pthreads
+          - linalg_lib: netlib
+            thread: openmp
 
     steps:
     - uses: actions/checkout@v2
