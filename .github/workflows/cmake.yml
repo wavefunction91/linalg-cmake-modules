@@ -71,6 +71,8 @@ jobs:
                  -DCMAKE_MODULE_PATH=${GITHUB_WORKSPACE} \
                  -DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH} \
                  -DIntelMKL_THREAD_LAYER=${{matrix.thread}}
+           cat .github/workflows/scripts/blas_libname.sh
+           echo .github/workflows/scripts/blas_libname.sh ${{matrix.linalg_lib}} ${{matrix.thread}}
            cmake -N -LA ${{runner.workspace}}/build-findblas-default | \
            grep "BLAS_LIBRARIES" | grep -E `.github/workflows/scripts/blas_libname.sh ${{matrix.linalg_lib}} ${{matrix.thread}}`
 
