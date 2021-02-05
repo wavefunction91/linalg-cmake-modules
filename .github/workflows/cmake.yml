@@ -30,37 +30,37 @@ jobs:
 
     - name: Ubuntu Setup
       run: |
-           ls /usr/lib/x86_64-linux-gnu/
+           ls /usr/lib/x86_64-linux-gnu/ | grep blas
            sudo apt-get -yq update && sudo apt-get install make wget curl libomp5
            sudo make -C .github/workflows/linalg install/main
            sudo make -C .github/workflows/linalg install/cmake
            sudo apt-get clean
            sudo make -C .github/workflows/linalg apt-add-repository/intel-mkl
-           ls /usr/lib/x86_64-linux-gnu/
+           ls /usr/lib/x86_64-linux-gnu/ | grep blas
 
     - name: Setup MPI
       run: |
-           ls /usr/lib/x86_64-linux-gnu/
+           ls /usr/lib/x86_64-linux-gnu/ | grep blas
            sudo make -C .github/workflows/linalg install/${{matrix.mpi_dist}}
-           ls /usr/lib/x86_64-linux-gnu/
+           ls /usr/lib/x86_64-linux-gnu/ | grep blas
 
 
     - name: Build Linalg
       env:
         BUILD_TARGET: ${{matrix.linalg_lib}}/${{matrix.int_interface}}-${{matrix.thread}} 
       run: |
-           ls /usr/lib/x86_64-linux-gnu/
+           ls /usr/lib/x86_64-linux-gnu/ | grep blas
            sudo make -C .github/workflows/linalg download/${{matrix.linalg_lib}} 
            sudo make -C .github/workflows/linalg install/${BUILD_TARGET}
-           ls /usr/lib/x86_64-linux-gnu/
+           ls /usr/lib/x86_64-linux-gnu/ | grep blas
 
     - name: Add-On NETLIB
       if: ${{ matrix.linalg_lib != 'intel-mkl' && matrix.linalg_lib != 'netlib' && matrix.int_interface == 'lp64' }} 
       run: |
-           ls /usr/lib/x86_64-linux-gnu/
+           ls /usr/lib/x86_64-linux-gnu/ | grep blas
            sudo make -C .github/workflows/linalg download/netlib
            sudo make -C .github/workflows/linalg install/netlib/lp64-sequential
-           ls /usr/lib/x86_64-linux-gnu/
+           ls /usr/lib/x86_64-linux-gnu/ | grep blas
 
 
 
