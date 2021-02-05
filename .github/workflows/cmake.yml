@@ -74,5 +74,15 @@ jobs:
               -DCMAKE_MODULE_PATH=${GITHUB_WORKSPACE} \
               -DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}
 
+    - name: FindLAPACK Integer Specific
+      if: ${{ matrix.linalg_lib != 'blis' || matrix.int_interface != 'ilp64' }}
+      env:
+        CMAKE_PREFIX_PATH: '/home/software/install/${{matrix.linalg_lib}}-${{matrix.int_interface}}-${{matrix.thread}};/home/software/install/netlib-lp64-serial' 
+      run: |
+        cmake -H${GITHUB_WORKSPACE}/examples/lapack/${{matrix.int_interface}} \
+              -B${{runner.workspace}}/build-findlapack-${{matrix.int_interface}} \
+              -DCMAKE_MODULE_PATH=${GITHUB_WORKSPACE} \
+              -DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}
+
 
     
