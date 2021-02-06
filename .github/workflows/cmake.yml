@@ -121,6 +121,6 @@ jobs:
                  -DCMAKE_MODULE_PATH=${GITHUB_WORKSPACE} \
                  -DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH} \
                  -DIntelMKL_THREAD_LAYER=${{matrix.thread}}
-           #cmake -N -LA ${{runner.workspace}}/build-findscalapack-default | \
-           #grep "ScaLAPACK_LIBRARIES" | grep -q -E `.github/workflows/scripts/scalapack_libname.sh ${{matrix.linalg_lib}} ${{matrix.thread}}`
+           cmake -N -LA ${{runner.workspace}}/build-findscalapack-default | \
+           grep "ScaLAPACK_LIBRARIES" | grep -q -E `.github/workflows/scripts/scalapack_libname.sh ${{matrix.linalg_lib}} ${{matrix.thread}} ${{matrix.int_interface}} ${{matrix.mpi_dist}}`
       
