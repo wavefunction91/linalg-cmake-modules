@@ -9,7 +9,7 @@ jobs:
     strategy:
       matrix:
         linalg_lib: [blis,openblas,netlib,intel-mkl]
-        mpi_dist: [mpich]
+        mpi_dist: [mpich,openmpi]
         int_interface: [lp64,ilp64]
         thread: [sequential,openmp,pthreads]
         exclude:
@@ -30,8 +30,6 @@ jobs:
 
     - name: Ubuntu Setup
       run: |
-           sudo apt-get remove libblas-dev libblas3 libgslcblas0
-           sudo apt-get remove liblapack-dev liblapack3 
            sudo apt-get -yq update && sudo apt-get install make wget curl libomp5
            sudo make -C .github/workflows/linalg install/main
            sudo make -C .github/workflows/linalg install/cmake
@@ -41,6 +39,7 @@ jobs:
     - name: Setup MPI
       run: |
            sudo make -C .github/workflows/linalg install/${{matrix.mpi_dist}}
+           which mpicc
 
 
     - name: Build Linalg
