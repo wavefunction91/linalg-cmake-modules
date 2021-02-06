@@ -97,11 +97,10 @@ jobs:
               -DCMAKE_MODULE_PATH=${GITHUB_WORKSPACE} \
               -DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH} \
               -DIntelMKL_THREAD_LAYER=${{matrix.thread}}
-        ls $MKLROOT
 
 
     - name: FindScaLAPACK Default
-      if: ${{ matrix.linalg_lib != 'intel-mkl' && matrix.int_interface == 'lp64' }}
+      if: ${{ matrix.linalg_lib == 'intel-mkl' || matrix.int_interface == 'lp64' }}
       run: |
            cmake -H${GITHUB_WORKSPACE}/examples/scalapack/default \
                  -B${{runner.workspace}}/build-findscalapack-default \
