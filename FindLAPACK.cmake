@@ -148,6 +148,8 @@ else()
 endif()
 
 
+# Cache variables
+set( LAPACK_LIBRARIES "${LAPACK_LIBRARIES}" CACHE STRING "LAPACK Libraries" FORCE )
 
 
 find_package_handle_standard_args( LAPACK
