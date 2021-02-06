@@ -114,7 +114,10 @@ jobs:
 
 
     - name: FindScaLAPACK Default
-      if: ${{ matrix.linalg_lib == 'intel-mkl' || matrix.int_interface == 'lp64' }}
+      # Disable for
+      #   - Non-MKL-ILP64 b/c NETLIB can't handle ILP64 consist
+      #   - MKL-ILP64 b/c the default is LP64 unless otherwise specified
+      if: ${{ (matrix.linalg_lib == 'intel-mkl' && matrix.int_interface == 'lp64')  || matrix.int_interface == 'lp64' }}
       run: |
            cmake -H${GITHUB_WORKSPACE}/examples/scalapack/default \
                  -B${{runner.workspace}}/build-findscalapack-default \
@@ -124,3 +127,15 @@ jobs:
            cmake -N -LA ${{runner.workspace}}/build-findscalapack-default | \
            grep "ScaLAPACK_LIBRARIES" | grep -q -E `.github/workflows/scripts/scalapack_libname.sh ${{matrix.linalg_lib}} ${{matrix.thread}} ${{matrix.int_interface}} ${{matrix.mpi_dist}}`
       
+    - name: FindScaLAPACK Integer Specific
+      # Disable for
+      #   - Non-MKL-ILP64 b/c NETLIB can't handle ILP64 consist
+      if: ${{ matrix.linalg_lib == 'intel-mkl' || matrix.int_interface == 'lp64' }}
+      run: |
+           cmake -H${GITHUB_WORKSPACE}/examples/scalapack/${{matrix.int_interface}} \
+                 -B${{runner.workspace}}/build-findscalapack-${{matrix.int_interface}} \
+                 -DCMAKE_MODULE_PATH=${GITHUB_WORKSPACE} \
+                 -DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH} \
+                 -DIntelMKL_THREAD_LAYER=${{matrix.thread}}
+           cmake -N -LA ${{runner.workspace}}/build-findscalapack-${{matrix.int_interface}} | \
+           grep "ScaLAPACK_LIBRARIES" | grep -q -E `.github/workflows/scripts/scalapack_libname.sh ${{matrix.linalg_lib}} ${{matrix.thread}} ${{matrix.int_interface}} ${{matrix.mpi_dist}}`

@@ -161,6 +161,7 @@ install/netlib/lp64-sequential-static:
 	rm -fr ${software_prefix}/build/netlib-lp64-sequential
 	cmake -H${software_prefix}/src/netlib/scalapack-2.1.0 \
               -B${software_prefix}/build/netlib-lp64-sequential \
+	      -DSCALAPACK_BUILD_TESTS=OFF \
 	      -DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH} \
               -DCMAKE_INSTALL_PREFIX=${software_prefix}/install/netlib-lp64-sequential
 	cmake --build ${software_prefix}/build/netlib-lp64-sequential --target install
@@ -169,6 +170,7 @@ install/netlib/lp64-sequential-shared:
 	rm -fr ${software_prefix}/build/netlib-lp64-sequential
 	cmake -H${software_prefix}/src/netlib/scalapack-2.1.0 \
               -B${software_prefix}/build/netlib-lp64-sequential \
+	      -DSCALAPACK_BUILD_TESTS=OFF \
 	      -DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH} \
               -DBUILD_SHARED_LIBS=ON \
               -DCMAKE_INSTALL_PREFIX=${software_prefix}/install/netlib-lp64-sequential
