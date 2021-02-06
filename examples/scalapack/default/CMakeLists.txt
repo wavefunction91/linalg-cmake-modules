@@ -1,7 +1,7 @@
 cmake_minimum_required( VERSION 3.10 )
 project(scalapack_test LANGUAGES C)
 
-find_package( ScaLAPACK COMPONENTS )
+find_package( ScaLAPACK REQUIRED )
 message( STATUS "ScaLAPACK_VENDOR              = ${ScaLAPACK_VENDOR}"              )
 message( STATUS "ScaLAPACK_LIBRARIES           = ${ScaLAPACK_LIBRARIES}"           )
 message( STATUS "ScaLAPACK_COMPILE_DEFINITIONS = ${ScaLAPACK_COMPILE_DEFINITIONS}" )

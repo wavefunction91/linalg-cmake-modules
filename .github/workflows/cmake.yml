@@ -58,12 +58,6 @@ jobs:
 
 
 
-
-
-
-
-
-
     - name: FindBLAS Default
       run: |
            cmake -H${GITHUB_WORKSPACE}/examples/blas/default \
@@ -103,4 +97,17 @@ jobs:
               -DCMAKE_MODULE_PATH=${GITHUB_WORKSPACE} \
               -DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH} \
               -DIntelMKL_THREAD_LAYER=${{matrix.thread}}
+        ls $MKLROOT
 
+
+    - name: FindScaLAPACK Default
+      if: ${{ matrix.linalg_lib != 'intel-mkl' && matrix.int_interface == 'lp64' }}
+      run: |
+           cmake -H${GITHUB_WORKSPACE}/examples/scalapack/default \
+                 -B${{runner.workspace}}/build-findscalapack-default \
+                 -DCMAKE_MODULE_PATH=${GITHUB_WORKSPACE} \
+                 -DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH} \
+                 -DIntelMKL_THREAD_LAYER=${{matrix.thread}}
+           #cmake -N -LA ${{runner.workspace}}/build-findscalapack-default | \
+           #grep "ScaLAPACK_LIBRARIES" | grep -q -E `.github/workflows/scripts/scalapack_libname.sh ${{matrix.linalg_lib}} ${{matrix.thread}}`
+      
