@@ -59,6 +59,7 @@ jobs:
 
 
     - name: FindBLAS Default
+      if: ${{ matrix.int_interface != 'ilp64' }} # Default is LP64
       run: |
            cmake -H${GITHUB_WORKSPACE}/examples/blas/default \
                  -B${{runner.workspace}}/build-findblas-default \
@@ -75,6 +76,8 @@ jobs:
                  -DCMAKE_MODULE_PATH=${GITHUB_WORKSPACE} \
                  -DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH} \
                  -DIntelMKL_THREAD_LAYER=${{matrix.thread}}
+           cmake -N -LA ${{runner.workspace}}/build-findblas-default | \
+           grep "BLAS_LIBRARIES" | grep -q -E `.github/workflows/scripts/blas_libname.sh ${{matrix.linalg_lib}} ${{matrix.thread}} ${{matrix.int_interface}}`
 
 
 
@@ -92,11 +95,13 @@ jobs:
     - name: FindLAPACK Integer Specific
       if: ${{ matrix.linalg_lib != 'blis' || matrix.int_interface != 'ilp64' }}
       run: |
-        cmake -H${GITHUB_WORKSPACE}/examples/lapack/${{matrix.int_interface}} \
-              -B${{runner.workspace}}/build-findlapack-${{matrix.int_interface}} \
-              -DCMAKE_MODULE_PATH=${GITHUB_WORKSPACE} \
-              -DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH} \
-              -DIntelMKL_THREAD_LAYER=${{matrix.thread}}
+           cmake -H${GITHUB_WORKSPACE}/examples/lapack/${{matrix.int_interface}} \
+                 -B${{runner.workspace}}/build-findlapack-${{matrix.int_interface}} \
+                 -DCMAKE_MODULE_PATH=${GITHUB_WORKSPACE} \
+                 -DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH} \
+                 -DIntelMKL_THREAD_LAYER=${{matrix.thread}}
+           cmake -N -LA ${{runner.workspace}}/build-findlapack-default | \
+           grep "LAPACK_LIBRARIES" | grep -q -E `.github/workflows/scripts/lapack_libname.sh ${{matrix.linalg_lib}} ${{matrix.thread}} ${{matrix.int_interface}}`
 
 
     - name: FindScaLAPACK Default
