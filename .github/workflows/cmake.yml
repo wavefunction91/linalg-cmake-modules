@@ -69,6 +69,8 @@ jobs:
            .github/workflows/scripts/blas_libname.sh ${{matrix.linalg_lib}} ${{matrix.thread}} ${{matrix.int_interface}}
            cmake -N -LA ${{runner.workspace}}/build-findblas-default | \
            grep "BLAS_LIBRARIES" | grep -q -E `.github/workflows/scripts/blas_libname.sh ${{matrix.linalg_lib}} ${{matrix.thread}} ${{matrix.int_interface}}`
+           cmake -N -LA ${{runner.workspace}}/build-findblas-default | \
+           grep "BLAS_LIBRARIES" 
 
     - name: FindBLAS Integer Specific
       run: |
@@ -80,6 +82,8 @@ jobs:
            .github/workflows/scripts/blas_libname.sh ${{matrix.linalg_lib}} ${{matrix.thread}} ${{matrix.int_interface}}
            cmake -N -LA ${{runner.workspace}}/build-findblas-default | \
            grep "BLAS_LIBRARIES" | grep -q -E `.github/workflows/scripts/blas_libname.sh ${{matrix.linalg_lib}} ${{matrix.thread}} ${{matrix.int_interface}}`
+           cmake -N -LA ${{runner.workspace}}/build-findblas-default | \
+           grep "BLAS_LIBRARIES" 
 
 
 
