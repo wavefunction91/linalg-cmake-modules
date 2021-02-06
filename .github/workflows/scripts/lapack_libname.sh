@@ -8,15 +8,17 @@ my_realpath() {
     [[ $1 = /* ]] && echo "$1" || echo "$PWD/${1#./}"
 }
 
+export local_path=$(my_realpath $0)
+export script_dir=$(dirname $local_path)
+export blas_name=`$script_dir/blas_libname.sh "$dist_name" "$thread_name" "$int_type"`
+
 if [ "$dist_name" == "netlib" ]
 then
   echo "lapack"
 elif [ "$dist_name" == "blis" ]
 then
-  echo "lapack.*blis"
+  echo "lapack.*$blas_name"
 else
-  export local_path=$(my_realpath $0)
-  export script_dir=$(dirname $local_path)
-  $script_dir/blas_libname.sh "$dist_name" "$thread_name" "$int_type"
+  echo "$blas_name"
 fi
 
