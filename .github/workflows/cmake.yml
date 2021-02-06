@@ -51,6 +51,10 @@ jobs:
            sudo make -C .github/workflows/linalg install/${BUILD_TARGET}
 
     - name: Add-On NETLIB
+      # Disable for 
+      #   - MKL b/c MKL already has a LAPACK/ScaLAPACK linker
+      #   - NETLIB b/c the NETLIB is already the used linear algebra lib (no need to add on)
+      #   - ILP64 b/c NETLIB isn't reliable for ILP64 yet
       if: ${{ matrix.linalg_lib != 'intel-mkl' && matrix.linalg_lib != 'netlib' && matrix.int_interface == 'lp64' }} 
       run: |
            sudo make -C .github/workflows/linalg download/netlib
@@ -59,7 +63,8 @@ jobs:
 
 
     - name: FindBLAS Default
-      if: ${{ matrix.int_interface != 'ilp64' }} # Default is LP64
+      # Disable for MKL-ILP64 b/c the default is LP64 unless otherwise specified
+      if: ${{ matrix.linalg_lib != 'intel-mkl' || matrix.int_interface != 'ilp64' }}
       run: |
            cmake -H${GITHUB_WORKSPACE}/examples/blas/default \
                  -B${{runner.workspace}}/build-findblas-default \
@@ -82,7 +87,10 @@ jobs:
 
 
     - name: FindLAPACK Default
-      if: ${{ matrix.linalg_lib != 'blis' || matrix.int_interface != 'ilp64' }}
+      # Disable for
+      #   - BLIS-ILP64 b/c BLIS doesn't have a LAPACK linker and NETLIB is not tested for ILP64
+      #   - MKL-ILP64 b/c the default is LP64 unless otherwise specified
+      if: ${{ (matrix.linalg_lib != 'blis' && matrix.linalg_lib != 'intel-mkl') || matrix.int_interface != 'ilp64' }}
       run: |
            cmake -H${GITHUB_WORKSPACE}/examples/lapack/default \
                  -B${{runner.workspace}}/build-findlapack-default \
@@ -93,6 +101,7 @@ jobs:
            grep "LAPACK_LIBRARIES" | grep -q -E `.github/workflows/scripts/lapack_libname.sh ${{matrix.linalg_lib}} ${{matrix.thread}} ${{matrix.int_interface}}`
 
     - name: FindLAPACK Integer Specific
+      # Disable for BLIS-ILP64 b/c BLIS doesn't have a LAPACK linker and NETLIB is not tested for ILP64
       if: ${{ matrix.linalg_lib != 'blis' || matrix.int_interface != 'ilp64' }}
       run: |
            cmake -H${GITHUB_WORKSPACE}/examples/lapack/${{matrix.int_interface}} \
