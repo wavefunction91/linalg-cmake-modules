@@ -21,12 +21,12 @@ jobs:
             thread: openmp
           - linalg_lib: intel-mkl
             thread: pthreads
+          - linalg_lib: netlib
           - mpi_dist: openmpi
-        include:
+          - linalg_lib: blis
           - mpi_dist: openmpi
-            linalg_lib: intel-mkl
-            int_interface: [lp64,ilp64]
-            thread: [sequential,openmp,pthreads]
+          - linalg_lib: openblas
+          - mpi_dist: openmpi
     env:
       MKLROOT: /opt/intel/mkl
       CMAKE_PREFIX_PATH: '/home/software/install/${{matrix.linalg_lib}}-${{matrix.int_interface}}-${{matrix.thread}};/home/software/install/netlib-lp64-sequential'
