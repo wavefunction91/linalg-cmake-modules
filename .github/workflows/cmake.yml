@@ -66,7 +66,7 @@ jobs:
                  -DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH} \
                  -DIntelMKL_THREAD_LAYER=${{matrix.thread}}
            cmake -N -LA ${{runner.workspace}}/build-findblas-default | \
-           grep "BLAS_LIBRARIES" | grep -q -E `.github/workflows/scripts/blas_libname.sh ${{matrix.linalg_lib}} ${{matrix.thread}}`
+           grep "BLAS_LIBRARIES" | grep -q -E `.github/workflows/scripts/blas_libname.sh ${{matrix.linalg_lib}} ${{matrix.thread}} ${{matrix.int_interface}}`
 
     - name: FindBLAS Integer Specific
       run: |
@@ -87,7 +87,7 @@ jobs:
                  -DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH} \
                  -DIntelMKL_THREAD_LAYER=${{matrix.thread}}
            cmake -N -LA ${{runner.workspace}}/build-findlapack-default | \
-           grep "LAPACK_LIBRARIES" | grep -q -E `.github/workflows/scripts/lapack_libname.sh ${{matrix.linalg_lib}} ${{matrix.thread}}`
+           grep "LAPACK_LIBRARIES" | grep -q -E `.github/workflows/scripts/lapack_libname.sh ${{matrix.linalg_lib}} ${{matrix.thread}} ${{matrix.int_interface}}`
 
     - name: FindLAPACK Integer Specific
       if: ${{ matrix.linalg_lib != 'blis' || matrix.int_interface != 'ilp64' }}

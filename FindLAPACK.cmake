@@ -148,14 +148,15 @@ else()
 endif()
 
 
-# Cache variables
-set( LAPACK_LIBRARIES "${LAPACK_LIBRARIES}" CACHE STRING "LAPACK Libraries" FORCE )
 
 
 find_package_handle_standard_args( LAPACK
   REQUIRED_VARS LAPACK_LINK_OK
   HANDLE_COMPONENTS
 )
+
+# Cache variables
+set( LAPACK_LIBRARIES "${LAPACK_LIBRARIES}" CACHE STRING "LAPACK Libraries" FORCE )
 
 if( LAPACK_FOUND AND NOT TARGET LAPACK::LAPACK )
   
