@@ -159,6 +159,9 @@ find_package_handle_standard_args( LAPACK
   HANDLE_COMPONENTS
 )
 
+# Cache variables
+set( LAPACK_LIBRARIES "${LAPACK_LIBRARIES}" CACHE STRING "LAPACK Libraries" FORCE )
+
 if( LAPACK_FOUND AND NOT TARGET LAPACK::LAPACK )
   
   add_library( LAPACK::LAPACK INTERFACE IMPORTED )

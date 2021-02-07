@@ -1,7 +1,7 @@
 cmake_minimum_required( VERSION 3.10 )
 project(lapack_test LANGUAGES C)
 
-find_package( LAPACK COMPONENTS )
+find_package( LAPACK REQUIRED )
 message( STATUS "LAPACK_VENDOR              = ${LAPACK_VENDOR}"              )
 message( STATUS "LAPACK_LIBRARIES           = ${LAPACK_LIBRARIES}"           )
 message( STATUS "LAPACK_COMPILE_DEFINITIONS = ${LAPACK_COMPILE_DEFINITIONS}" )
