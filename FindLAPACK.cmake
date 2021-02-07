@@ -141,6 +141,8 @@ if( LAPACK_LINK_OK )
   else()
     set( LAPACK_lp64_FOUND  FALSE )
     set( LAPACK_ilp64_FOUND TRUE  )
+    find_dependency( ILP64 )
+    list( APPEND LAPACK_COMPILE_OPTIONS "${ILP64_COMPILE_OPTIONS}" )
   endif()
 
 else()

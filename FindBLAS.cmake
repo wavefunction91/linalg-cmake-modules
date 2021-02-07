@@ -99,6 +99,8 @@ if( BLAS_LINK_OK )
   else()
     set( BLAS_lp64_FOUND  FALSE )
     set( BLAS_ilp64_FOUND TRUE  )
+    find_dependency( ILP64 )
+    list( APPEND BLAS_COMPILE_OPTIONS "${ILP64_COMPILE_OPTIONS}" )
   endif()
 
 endif()
