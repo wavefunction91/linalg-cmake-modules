@@ -110,7 +110,13 @@ find_package_handle_standard_args( BLAS
 )
 
 # Cache variables
-set( BLAS_LIBRARIES "${BLAS_LIBRARIES}" CACHE STRING "BLAS Libraries" FORCE )
+if( BLAS_FOUND )
+  set( BLAS_VENDOR              "${BLAS_VENDOR}"              CACHE STRING "BLAS Vendor"              FORCE )
+  set( BLAS_LIBRARIES           "${BLAS_LIBRARIES}"           CACHE STRING "BLAS Libraries"           FORCE )
+  set( BLAS_COMPILE_DEFINITIONS "${BLAS_COMPILE_DEFINITIONS}" CACHE STRING "BLAS Compile Definitions" FORCE )
+  set( BLAS_INCLUDE_DIRS        "${BLAS_INCLUDE_DIRS}"        CACHE STRING "BLAS Include Directories" FORCE )
+  set( BLAS_COMPILE_OPTIONS     "${BLAS_COMPILE_OPTIONS}"     CACHE STRING "BLAS Compile Options"     FORCE )
+endif()
 
 if( BLAS_FOUND AND NOT TARGET BLAS::BLAS )
   
