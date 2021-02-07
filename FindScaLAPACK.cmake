@@ -228,6 +228,9 @@ find_package_handle_standard_args( ScaLAPACK
   HANDLE_COMPONENTS
 )
 
+# Cache variables
+set( ScaLAPACK_LIBRARIES "${ScaLAPACK_LIBRARIES}" CACHE STRING "ScaLAPACK Libraries" FORCE )
+
 if( ScaLAPACK_FOUND AND NOT TARGET ScaLAPACK::ScaLAPACK )
   
   add_library( ScaLAPACK::ScaLAPACK INTERFACE IMPORTED )

@@ -1,7 +1,7 @@
 cmake_minimum_required( VERSION 3.10 )
 project(blas_test LANGUAGES C)
 
-find_package( BLAS COMPONENTS )
+find_package( BLAS REQUIRED )
 message( STATUS "BLAS_VENDOR              = ${BLAS_VENDOR}"              )
 message( STATUS "BLAS_LIBRARIES           = ${BLAS_LIBRARIES}"           )
 message( STATUS "BLAS_COMPILE_DEFINITIONS = ${BLAS_COMPILE_DEFINITIONS}" )
