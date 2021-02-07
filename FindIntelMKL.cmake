@@ -303,19 +303,8 @@ find_library( IntelMKL_LP64_ScaLAPACK_LIBRARY
 
 # Default to LP64
 if( "ilp64" IN_LIST IntelMKL_FIND_COMPONENTS )
-	#  set( IntelMKL_COMPILE_DEFINITIONS "MKL_ILP64" )
-	#  if( CMAKE_C_COMPILER_ID MATCHES "GNU" )
-	#    set( IntelMKL_C_COMPILE_FLAGS        "-m64" )
-	#  endif()
-	#  if( CMAKE_Fortran_COMPILER_ID MATCHES "GNU" )
-	#    set( IntelMKL_Fortran_COMPILE_FLAGS  "-m64" "-fdefault-integer-8" )
-	#  elseif( CMAKE_Fortran_COMPILER_ID MATCHES "Flang" )
-	#    set( IntelMKL_Fortran_COMPILE_FLAGS  "-fdefault-integer-8" )
-	#  elseif( CMAKE_C_COMPILER_ID MATCHES "PGI" )
-	#    set( IntelMKL_Fortran_COMPILE_FLAGS "-i8" )
-	#  endif()
+
   set( IntelMKL_LIBRARY ${IntelMKL_ILP64_LIBRARY} )
-  # set( IntelMKL_COMPILE_OPTIONS ${IntelMKL_C_COMPILE_FLAGS} )
 
   if( IntelMKL_ILP64_BLACS_LIBRARY )
     set( IntelMKL_BLACS_LIBRARY ${IntelMKL_ILP64_BLACS_LIBRARY} )
