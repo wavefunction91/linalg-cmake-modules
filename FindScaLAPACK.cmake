@@ -166,6 +166,8 @@ if( ScaLAPACK_LINK_OK )
   else()
     set( ScaLAPACK_lp64_FOUND  FALSE )
     set( ScaLAPACK_ilp64_FOUND TRUE  )
+    find_dependency( ILP64 )
+    list( APPEND ScaLAPACK_COMPILE_OPTIONS "${ILP64_COMPILE_OPTIONS}" )
   endif()
 
 else()
