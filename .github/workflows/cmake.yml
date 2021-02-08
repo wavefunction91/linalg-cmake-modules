@@ -120,7 +120,7 @@ jobs:
                  -B${{runner.workspace}}/build-findlapack-default \
                  -DCMAKE_MODULE_PATH=${GITHUB_WORKSPACE} \
                  -DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH} \
-                 -DBLAS_THREAD_LAYER=${{matrix.thread}}
+                 -DLAPACK_THREAD_LAYER=${{matrix.thread}}
            .github/workflows/scripts/check_lapack_cmake_cache.sh \
                  ${{runner.workspace}}/build-findlapack-default \
                  ${{matrix.linalg_lib}} ${{matrix.thread}} ${{matrix.int_interface}}
@@ -133,9 +133,22 @@ jobs:
                  -B${{runner.workspace}}/build-findlapack-${{matrix.int_interface}} \
                  -DCMAKE_MODULE_PATH=${GITHUB_WORKSPACE} \
                  -DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH} \
-                 -DBLAS_THREAD_LAYER=${{matrix.thread}}
+                 -DLAPACK_THREAD_LAYER=${{matrix.thread}}
            .github/workflows/scripts/check_lapack_cmake_cache.sh \
                  ${{runner.workspace}}/build-findlapack-${{matrix.int_interface}} \
+                 ${{matrix.linalg_lib}} ${{matrix.thread}} ${{matrix.int_interface}}
+
+    - name: FindLAPACK Static Linkage
+      if: ${{ matrix.linalg_lib != 'blis' || matrix.int_interface != 'ilp64' }}
+      run: |
+           cmake -H${GITHUB_WORKSPACE}/examples/lapack/${{matrix.int_interface}} \
+                 -B${{runner.workspace}}/build-findlapack-static \
+                 -DCMAKE_MODULE_PATH=${GITHUB_WORKSPACE} \
+                 -DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH} \
+                 -DLAPACK_THREAD_LAYER=${{matrix.thread}} \
+                 -DLAPACK_PREFERS_STATIC=ON
+           .github/workflows/scripts/check_lapack_cmake_cache.sh \
+                 ${{runner.workspace}}/build-findlapack-static \
                  ${{matrix.linalg_lib}} ${{matrix.thread}} ${{matrix.int_interface}}
 
 
