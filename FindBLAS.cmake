@@ -29,6 +29,9 @@ fill_out_prefix( BLAS )
 
 if( NOT BLAS_PREFERENCE_LIST )
   set( BLAS_PREFERENCE_LIST "IntelMKL" "IBMESSL" "BLIS" "OpenBLAS" "ReferenceBLAS" )
+  if( CMAKE_SYSTEM_NAME MATCHES "Darwin" )
+    list( PREPEND BLAS_PREFERENCE_LIST "Accelerate" )
+  endif()
 endif()
 
 if( NOT BLAS_LIBRARIES )
