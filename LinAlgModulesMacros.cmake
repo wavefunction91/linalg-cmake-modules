@@ -6,6 +6,8 @@ macro( find_linalg_dependencies _libs )
       find_dependency(OpenMP)
     elseif (${_lib} MATCHES "Threads")
       find_dependency(Threads)
+    elseif (${_lib} MATCHES "tbb")
+      find_dependency(TBB)
     endif()
   endforeach()
 endmacro()
@@ -24,6 +26,7 @@ set( LINALG_FIND_MODULES
      FindReferenceScaLAPACK.cmake
      FindScaLAPACK.cmake
      FindILP64.cmake
+     FindTBB.cmake
      FindStandardFortran.cmake
      LinAlgModulesMacros.cmake
 )
