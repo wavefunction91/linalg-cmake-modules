@@ -91,6 +91,17 @@ jobs:
                  ${{runner.workspace}}/build-findblas-${{matrix.int_interface}} \
                  ${{matrix.linalg_lib}} ${{matrix.thread}} ${{matrix.int_interface}}
 
+    - name: FindBLAS Static Linkage
+      run: |
+           cmake -H${GITHUB_WORKSPACE}/examples/blas/${{matrix.int_interface}} \
+                 -B${{runner.workspace}}/build-findblas-static \
+                 -DCMAKE_MODULE_PATH=${GITHUB_WORKSPACE} \
+                 -DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH} \
+                 -DIntelMKL_THREAD_LAYER=${{matrix.thread}} \
+                 -DBLAS_PREFERS_STATIC=ON
+           .github/workflows/scripts/check_blas_cmake_cache.sh \
+                 ${{runner.workspace}}/build-findblas-static \
+                 ${{matrix.linalg_lib}} ${{matrix.thread}} ${{matrix.int_interface}}
 
 
     - name: FindLAPACK Default
