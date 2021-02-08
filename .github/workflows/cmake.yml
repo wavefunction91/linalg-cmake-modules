@@ -53,10 +53,10 @@ jobs:
            sudo make -C .github/workflows/linalg install/${{matrix.mpi_dist}}
            which mpicc
 
-   - name: Setup TBB
-     if: ${{matrix.thread == 'tbb'}}
-     run: |
-          sudo apt-get install libtbb-dev
+    - name: Setup TBB
+      if: ${{matrix.thread == 'tbb'}}
+      run: |
+           sudo apt-get install libtbb-dev
 
 
     - name: Build Linalg
