@@ -413,19 +413,25 @@ if( IntelMKL_LIBRARY AND IntelMKL_THREAD_LIBRARY AND IntelMKL_CORE_LIBRARY )
   elseif( IntelMKL_THREAD_LAYER MATCHES "tbb" )
 
     if( NOT TARGET tbb )
-      message( FATAL_ERROR "TBB Bindings Not Currently Accessible Through FindIntelMKL" )
+	    #message( FATAL_ERROR "TBB Bindings Not Currently Accessible Through FindIntelMKL" )
       find_dependency( TBB )
     endif()
 
-    list( APPEND IntelMKL_BLAS_LAPACK_LIBRARIES tbb )
+    set( _mkl_tbb_extra_libs tbb )
+    if( IntelMKL_PREFERS_STATIC )
+      list( APPEND _mkl_tbb_extra_libs "stdc++" ) 
+    endif()
+    list( APPEND IntelMKL_BLAS_LAPACK_LIBRARIES ${_mkl_tbb_extra_libs} )
 
     if( IntelMKL_BLACS_LIBRARIES )
-      list( APPEND IntelMKL_BLACS_LIBRARIES tbb )
+      list( APPEND IntelMKL_BLACS_LIBRARIES ${_mkl_tbb_extra_libs} )
     endif()
 
     if( IntelMKL_ScaLAPACK_LIBRARIES )
-      list( APPEND IntelMKL_ScaLAPACK_LIBRARIES tbb )
+      list( APPEND IntelMKL_ScaLAPACK_LIBRARIES ${_mkl_tbb_extra_libs} )
     endif()
+
+    unset( _mkl_tbb_extra_libs )
 
   endif()
 
