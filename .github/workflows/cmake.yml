@@ -79,8 +79,6 @@ jobs:
            .github/workflows/scripts/check_blas_cmake_cache.sh \
                  ${{runner.workspace}}/build-findblas-default \
                  ${{matrix.linalg_lib}} ${{matrix.thread}} ${{matrix.int_interface}}
-           #cmake -N -LA ${{runner.workspace}}/build-findblas-default | \
-           #grep "BLAS_LIBRARIES" | grep -q -E `.github/workflows/scripts/blas_libname.sh ${{matrix.linalg_lib}} ${{matrix.thread}} ${{matrix.int_interface}}`
 
     - name: FindBLAS Integer Specific
       run: |
@@ -89,8 +87,9 @@ jobs:
                  -DCMAKE_MODULE_PATH=${GITHUB_WORKSPACE} \
                  -DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH} \
                  -DIntelMKL_THREAD_LAYER=${{matrix.thread}}
-           cmake -N -LA ${{runner.workspace}}/build-findblas-${{matrix.int_interface}} | \
-           grep "BLAS_LIBRARIES" | grep -q -E `.github/workflows/scripts/blas_libname.sh ${{matrix.linalg_lib}} ${{matrix.thread}} ${{matrix.int_interface}}`
+           .github/workflows/scripts/check_blas_cmake_cache.sh \
+                 ${{runner.workspace}}/build-findblas-${{matrix.int_interface}} \
+                 ${{matrix.linalg_lib}} ${{matrix.thread}} ${{matrix.int_interface}}
 
 
 
@@ -105,8 +104,9 @@ jobs:
                  -DCMAKE_MODULE_PATH=${GITHUB_WORKSPACE} \
                  -DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH} \
                  -DIntelMKL_THREAD_LAYER=${{matrix.thread}}
-           cmake -N -LA ${{runner.workspace}}/build-findlapack-default | \
-           grep "LAPACK_LIBRARIES" | grep -q -E `.github/workflows/scripts/lapack_libname.sh ${{matrix.linalg_lib}} ${{matrix.thread}} ${{matrix.int_interface}}`
+           .github/workflows/scripts/check_lapack_cmake_cache.sh \
+                 ${{runner.workspace}}/build-findlapack-default \
+                 ${{matrix.linalg_lib}} ${{matrix.thread}} ${{matrix.int_interface}}
 
     - name: FindLAPACK Integer Specific
       # Disable for BLIS-ILP64 b/c BLIS doesn't have a LAPACK linker and NETLIB is not tested for ILP64
@@ -117,8 +117,9 @@ jobs:
                  -DCMAKE_MODULE_PATH=${GITHUB_WORKSPACE} \
                  -DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH} \
                  -DIntelMKL_THREAD_LAYER=${{matrix.thread}}
-           cmake -N -LA ${{runner.workspace}}/build-findlapack-${{matrix.int_interface}} | \
-           grep "LAPACK_LIBRARIES" | grep -q -E `.github/workflows/scripts/lapack_libname.sh ${{matrix.linalg_lib}} ${{matrix.thread}} ${{matrix.int_interface}}`
+           .github/workflows/scripts/check_lapack_cmake_cache.sh \
+                 ${{runner.workspace}}/build-findlapack-${{matrix.int_interface}} \
+                 ${{matrix.linalg_lib}} ${{matrix.thread}} ${{matrix.int_interface}}
 
 
     - name: FindScaLAPACK Default
@@ -132,8 +133,9 @@ jobs:
                  -DCMAKE_MODULE_PATH=${GITHUB_WORKSPACE} \
                  -DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH} \
                  -DIntelMKL_THREAD_LAYER=${{matrix.thread}}
-           cmake -N -LA ${{runner.workspace}}/build-findscalapack-default | \
-           grep "ScaLAPACK_LIBRARIES" | grep -q -E `.github/workflows/scripts/scalapack_libname.sh ${{matrix.linalg_lib}} ${{matrix.thread}} ${{matrix.int_interface}} ${{matrix.mpi_dist}}`
+           .github/workflows/scripts/check_scalapack_cmake_cache.sh \
+                 ${{runner.workspace}}/build-findscalapack-default \
+                 ${{matrix.linalg_lib}} ${{matrix.thread}} ${{matrix.int_interface}} ${{matrix.mpi_dist}}
       
     - name: FindScaLAPACK Integer Specific
       # Disable for
@@ -145,5 +147,6 @@ jobs:
                  -DCMAKE_MODULE_PATH=${GITHUB_WORKSPACE} \
                  -DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH} \
                  -DIntelMKL_THREAD_LAYER=${{matrix.thread}}
-           cmake -N -LA ${{runner.workspace}}/build-findscalapack-${{matrix.int_interface}} | \
-           grep "ScaLAPACK_LIBRARIES" | grep -q -E `.github/workflows/scripts/scalapack_libname.sh ${{matrix.linalg_lib}} ${{matrix.thread}} ${{matrix.int_interface}} ${{matrix.mpi_dist}}`
+           .github/workflows/scripts/check_scalapack_cmake_cache.sh \
+                 ${{runner.workspace}}/build-findscalapack-${{matrix.int_interface}} \
+                 ${{matrix.linalg_lib}} ${{matrix.thread}} ${{matrix.int_interface}} ${{matrix.mpi_dist}}
