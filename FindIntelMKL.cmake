@@ -304,6 +304,7 @@ find_library( IntelMKL_LP64_ScaLAPACK_LIBRARY
 # Default to LP64
 if( "ilp64" IN_LIST IntelMKL_FIND_COMPONENTS )
 
+  set( IntelMKL_COMPILE_DEFINITIONS "MKL_ILP64" )
   set( IntelMKL_LIBRARY ${IntelMKL_ILP64_LIBRARY} )
 
   if( IntelMKL_ILP64_BLACS_LIBRARY )
