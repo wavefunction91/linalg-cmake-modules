@@ -39,11 +39,29 @@ foreach( _uplo LOWER UPPER )
 
     else()
 
-      # Check for Standard Fortran Libraries
-      if(NOT STANDARDFORTRAN_LIBRARIES)
-        include(CMakeFindDependencyMacro)
-        find_dependency(StandardFortran REQUIRED)
+      if( _compile_output MATCHES "fortran" )
+        # Check for Standard Fortran Libraries
+        if(NOT STANDARDFORTRAN_LIBRARIES)
+          include(CMakeFindDependencyMacro)
+          find_dependency( StandardFortran )
+        endif()
         list( APPEND ${_libs} ${STANDARDFORTRAN_LIBRARIES} )
+        set( ${_libs} ${${_libs}} PARENT_SCOPE )
+      endif()
+
+      if( _compile_output MATCHES "omp" )
+        if( NOT TARGET OpenMP::OpenMP_C )
+          find_dependency( OpenMP )
+	endif()
+	list( APPEND ${_libs} OpenMP::OpenMP_C )
+        set( ${_libs} ${${_libs}} PARENT_SCOPE )
+      endif()
+
+      if( _compile_output MATCHES "pthread" )
+        if( NOT TARGET Threads::Threads )
+          find_dependency( Threads )
+	endif()
+	list( APPEND ${_libs} Threads::Threads )
         set( ${_libs} ${${_libs}} PARENT_SCOPE )
       endif()
 
