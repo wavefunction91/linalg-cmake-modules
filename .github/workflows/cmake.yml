@@ -76,7 +76,7 @@ jobs:
                  -DCMAKE_MODULE_PATH=${GITHUB_WORKSPACE} \
                  -DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH} \
                  -DIntelMKL_THREAD_LAYER=${{matrix.thread}}
-           ./github/workflows/scripts/check_blas_cmake_cache.sh \
+           .github/workflows/scripts/check_blas_cmake_cache.sh \
                  ${{runner.workspace}}/build-findblas-default \
                  ${{matrix.linalg_lib}} ${{matrix.thread}} ${{matrix.int_interface}}
            #cmake -N -LA ${{runner.workspace}}/build-findblas-default | \
