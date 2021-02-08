@@ -75,7 +75,7 @@ jobs:
                  -B${{runner.workspace}}/build-findblas-default \
                  -DCMAKE_MODULE_PATH=${GITHUB_WORKSPACE} \
                  -DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH} \
-                 -DIntelMKL_THREAD_LAYER=${{matrix.thread}}
+                 -DBLAS_THREAD_LAYER=${{matrix.thread}}
            .github/workflows/scripts/check_blas_cmake_cache.sh \
                  ${{runner.workspace}}/build-findblas-default \
                  ${{matrix.linalg_lib}} ${{matrix.thread}} ${{matrix.int_interface}}
@@ -86,7 +86,7 @@ jobs:
                  -B${{runner.workspace}}/build-findblas-${{matrix.int_interface}} \
                  -DCMAKE_MODULE_PATH=${GITHUB_WORKSPACE} \
                  -DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH} \
-                 -DIntelMKL_THREAD_LAYER=${{matrix.thread}}
+                 -DBLAS_THREAD_LAYER=${{matrix.thread}}
            .github/workflows/scripts/check_blas_cmake_cache.sh \
                  ${{runner.workspace}}/build-findblas-${{matrix.int_interface}} \
                  ${{matrix.linalg_lib}} ${{matrix.thread}} ${{matrix.int_interface}}
@@ -97,11 +97,17 @@ jobs:
                  -B${{runner.workspace}}/build-findblas-static \
                  -DCMAKE_MODULE_PATH=${GITHUB_WORKSPACE} \
                  -DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH} \
-                 -DIntelMKL_THREAD_LAYER=${{matrix.thread}} \
+                 -DBLAS_THREAD_LAYER=${{matrix.thread}} \
                  -DBLAS_PREFERS_STATIC=ON
            .github/workflows/scripts/check_blas_cmake_cache.sh \
                  ${{runner.workspace}}/build-findblas-static \
                  ${{matrix.linalg_lib}} ${{matrix.thread}} ${{matrix.int_interface}}
+
+    - name: FindBLAS Static Linkage (Error Output)
+      if: ${{ failure() }}
+      run: |
+           echo "CMAKE OUTPUT" && cat ${{runner.workspace}}/build-findblas-static/CMakeFiles/CMakeOutput.log
+           echo "CMAKE ERROR"  && cat ${{runner.workspace}}/build-findblas-static/CMakeFiles/CMakeError.log
 
 
     - name: FindLAPACK Default
@@ -114,7 +120,7 @@ jobs:
                  -B${{runner.workspace}}/build-findlapack-default \
                  -DCMAKE_MODULE_PATH=${GITHUB_WORKSPACE} \
                  -DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH} \
-                 -DIntelMKL_THREAD_LAYER=${{matrix.thread}}
+                 -DBLAS_THREAD_LAYER=${{matrix.thread}}
            .github/workflows/scripts/check_lapack_cmake_cache.sh \
                  ${{runner.workspace}}/build-findlapack-default \
                  ${{matrix.linalg_lib}} ${{matrix.thread}} ${{matrix.int_interface}}
@@ -127,7 +133,7 @@ jobs:
                  -B${{runner.workspace}}/build-findlapack-${{matrix.int_interface}} \
                  -DCMAKE_MODULE_PATH=${GITHUB_WORKSPACE} \
                  -DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH} \
-                 -DIntelMKL_THREAD_LAYER=${{matrix.thread}}
+                 -DBLAS_THREAD_LAYER=${{matrix.thread}}
            .github/workflows/scripts/check_lapack_cmake_cache.sh \
                  ${{runner.workspace}}/build-findlapack-${{matrix.int_interface}} \
                  ${{matrix.linalg_lib}} ${{matrix.thread}} ${{matrix.int_interface}}
@@ -143,7 +149,7 @@ jobs:
                  -B${{runner.workspace}}/build-findscalapack-default \
                  -DCMAKE_MODULE_PATH=${GITHUB_WORKSPACE} \
                  -DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH} \
-                 -DIntelMKL_THREAD_LAYER=${{matrix.thread}}
+                 -DBLAS_THREAD_LAYER=${{matrix.thread}}
            .github/workflows/scripts/check_scalapack_cmake_cache.sh \
                  ${{runner.workspace}}/build-findscalapack-default \
                  ${{matrix.linalg_lib}} ${{matrix.thread}} ${{matrix.int_interface}} ${{matrix.mpi_dist}}
@@ -157,7 +163,7 @@ jobs:
                  -B${{runner.workspace}}/build-findscalapack-${{matrix.int_interface}} \
                  -DCMAKE_MODULE_PATH=${GITHUB_WORKSPACE} \
                  -DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH} \
-                 -DIntelMKL_THREAD_LAYER=${{matrix.thread}}
+                 -DBLAS_THREAD_LAYER=${{matrix.thread}}
            .github/workflows/scripts/check_scalapack_cmake_cache.sh \
                  ${{runner.workspace}}/build-findscalapack-${{matrix.int_interface}} \
                  ${{matrix.linalg_lib}} ${{matrix.thread}} ${{matrix.int_interface}} ${{matrix.mpi_dist}}

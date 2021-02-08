@@ -81,6 +81,10 @@ function( copy_meta_data _src _dest )
     set( ${_dest}_PREFERS_STATIC  ${${_src}_PREFERS_STATIC} PARENT_SCOPE )
   endif()
 
+  if( ${_src}_THREAD_LAYER AND NOT ${_dest}_THREAD_LAYER )
+    set( ${_dest}_THREAD_LAYER  ${${_src}_THREAD_LAYER} PARENT_SCOPE )
+  endif()
+
 endfunction()
 
 
