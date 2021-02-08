@@ -11,7 +11,7 @@ jobs:
         linalg_lib: [blis,openblas,netlib,intel-mkl]
         mpi_dist: [mpich,openmpi]
         int_interface: [lp64,ilp64]
-        thread: [sequential,openmp,pthreads]
+        thread: [sequential,openmp,pthreads,tbb]
         exclude:
           - linalg_lib: netlib
             int_interface: ilp64
@@ -27,6 +27,12 @@ jobs:
             mpi_dist: openmpi
           - linalg_lib: openblas
             mpi_dist: openmpi
+          - linald_lib: blis
+            thread: tbb
+          - linald_lib: openblas
+            thread: tbb
+          - linald_lib: netlib
+            thread: tbb
     env:
       MKLROOT: /opt/intel/mkl
       CMAKE_PREFIX_PATH: '/home/software/install/${{matrix.linalg_lib}}-${{matrix.int_interface}}-${{matrix.thread}};/home/software/install/netlib-lp64-sequential'
