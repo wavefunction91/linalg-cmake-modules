@@ -36,6 +36,7 @@ if( NOT LAPACK_LIBRARIES )
 
   # Find BLAS
   if( NOT TARGET BLAS::BLAS )
+    copy_meta_data( LAPACK BLAS )	  
     find_dependency( BLAS 
       COMPONENTS          ${LAPACK_REQUIRED_COMPONENTS} 
       OPTIONAL_COMPONENTS ${LAPACK_OPTIONAL_COMPONENTS} 

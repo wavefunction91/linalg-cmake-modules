@@ -64,6 +64,7 @@ if( NOT ScaLAPACK_LIBRARIES )
 
   # Find LAPACK
   if( NOT TARGET LAPACK::LAPACK )
+    copy_meta_data( ScaLAPACK LAPACK )
     find_dependency( LAPACK 
       COMPONENTS          ${ScaLAPACK_REQUIRED_COMPONENTS}
       OPTIONAL_COMPONENTS ${ScaLAPACK_OPTIONAL_COMPONENTS} scalapack blacs 
