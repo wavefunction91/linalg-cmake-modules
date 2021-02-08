@@ -27,11 +27,11 @@ jobs:
             mpi_dist: openmpi
           - linalg_lib: openblas
             mpi_dist: openmpi
-          - linald_lib: blis
+          - linalg_lib: blis
             thread: tbb
-          - linald_lib: openblas
+          - linalg_lib: openblas
             thread: tbb
-          - linald_lib: netlib
+          - linalg_lib: netlib
             thread: tbb
     env:
       MKLROOT: /opt/intel/mkl
