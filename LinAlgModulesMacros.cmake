@@ -23,6 +23,7 @@ set( LINALG_FIND_MODULES
      FindReferenceLAPACK.cmake
      FindReferenceScaLAPACK.cmake
      FindScaLAPACK.cmake
+     FindILP64.cmake
      FindStandardFortran.cmake
      LinAlgModulesMacros.cmake
 )

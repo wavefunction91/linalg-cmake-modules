@@ -77,6 +77,10 @@ function( copy_meta_data _src _dest )
     set( ${_dest}_LIBRARY_DIR ${${_src}_LIBRARY_DIR} PARENT_SCOPE )
   endif()
 
+  if( ${_src}_PREFERS_STATIC AND NOT ${_dest}_PREFERS_STATIC )
+    set( ${_dest}_PREFERS_STATIC  ${${_src}_PREFERS_STATIC} PARENT_SCOPE )
+  endif()
+
 endfunction()
 
 
