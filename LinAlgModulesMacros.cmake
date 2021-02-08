@@ -1,6 +1,7 @@
 set( LINALG_MACROS_DIR ${CMAKE_CURRENT_LIST_DIR} )
 
 macro( find_linalg_dependencies _libs )
+  include( CMakeFindDependencyMacro )
   foreach( _lib ${${_libs}} )
     if (${_lib} MATCHES "OpenMP")
       find_dependency(OpenMP)

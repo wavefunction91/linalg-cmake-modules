@@ -39,8 +39,6 @@ foreach( _uplo LOWER UPPER )
 
     else()
 
-      message( STATUS ${_compile_output} )
-
       append_possibly_missing_libs( BLAS _compile_output ${_libs} _new_libs )
       list( APPEND ${_libs} ${_new_libs} )
       set( ${_libs} ${${_libs}} PARENT_SCOPE )
