@@ -117,6 +117,7 @@ find_package_handle_standard_args( BLAS
 # Cache variables
 if( BLAS_FOUND )
   set( BLAS_VENDOR              "${BLAS_VENDOR}"              CACHE STRING "BLAS Vendor"              FORCE )
+  set( BLAS_IS_LP64             "${BLAS_IS_LP64}"             CACHE STRING "BLAS LP64 Flag"           FORCE )
   set( BLAS_LIBRARIES           "${BLAS_LIBRARIES}"           CACHE STRING "BLAS Libraries"           FORCE )
   set( BLAS_COMPILE_DEFINITIONS "${BLAS_COMPILE_DEFINITIONS}" CACHE STRING "BLAS Compile Definitions" FORCE )
   set( BLAS_INCLUDE_DIRS        "${BLAS_INCLUDE_DIRS}"        CACHE STRING "BLAS Include Directories" FORCE )

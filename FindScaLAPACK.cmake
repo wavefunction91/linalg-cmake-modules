@@ -185,6 +185,7 @@ find_package_handle_standard_args( ScaLAPACK
 )
 
 # Cache variables
+set( ScaLAPACK_IS_LP64   "${ScaLAPACK_IS_LP64}"   CACHE STRING "ScaLAPACK LP64 Flag" FORCE )
 set( ScaLAPACK_LIBRARIES "${ScaLAPACK_LIBRARIES}" CACHE STRING "ScaLAPACK Libraries" FORCE )
 
 if( ScaLAPACK_FOUND AND NOT TARGET ScaLAPACK::ScaLAPACK )

@@ -165,7 +165,7 @@ find_package_handle_standard_args( LAPACK
 # Cache variables
 if( LAPACK_FOUND )
   set( LAPACK_VENDOR              "${LAPACK_VENDOR}"              CACHE STRING "LAPACK Vendor"              FORCE )
-  set( LAPACK_IS_LP64             "${LAPACK_IS_LP64}"             CACHE STRING "LAPACK LP64"                FORCE )
+  set( LAPACK_IS_LP64             "${LAPACK_IS_LP64}"             CACHE STRING "LAPACK LP64 Flag"           FORCE )
   set( LAPACK_LIBRARIES           "${LAPACK_LIBRARIES}"           CACHE STRING "LAPACK Libraries"           FORCE )
   set( LAPACK_COMPILE_DEFINITIONS "${LAPACK_COMPILE_DEFINITIONS}" CACHE STRING "LAPACK Compile Definitions" FORCE )
   set( LAPACK_INCLUDE_DIRS        "${LAPACK_INCLUDE_DIRS}"        CACHE STRING "LAPACK Include Directories" FORCE )
