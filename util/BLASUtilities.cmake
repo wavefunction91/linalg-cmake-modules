@@ -94,11 +94,6 @@ try_run( _run_result _compile_result ${CMAKE_CURRENT_BINARY_DIR}
   RUN_OUTPUT_VARIABLE     _run_output
 )
 
-#if( ${_run_result} EQUAL 0 )
-#  set( ${_libs_are_lp64} TRUE PARENT_SCOPE )
-#else()
-#  set( ${_libs_are_lp64} FALSE PARENT_SCOPE )
-#endif()
 if( _run_output MATCHES "BLAS IS LP64" )
   set( ${_libs_are_lp64} TRUE PARENT_SCOPE )
 else()
