@@ -61,9 +61,9 @@ endfunction()
 
 function( copy_meta_data _src _dest )
 
-  if( ${_src}_LIBRARIES AND NOT ${_dest}_LIBRARIES )
-    set( ${_dest}_LIBRARIES ${${_src}_LIBRARIES} PARENT_SCOPE )
-  endif()
+	#if( ${_src}_LIBRARIES AND NOT ${_dest}_LIBRARIES )
+  	#  set( ${_dest}_LIBRARIES ${${_src}_LIBRARIES} PARENT_SCOPE )
+  	#endif()
 
   if( ${_src}_PREFIX AND NOT ${_dest}_PREFIX )
     set( ${_dest}_PREFIX ${${_src}_PREFIX} PARENT_SCOPE )

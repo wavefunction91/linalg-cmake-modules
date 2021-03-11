@@ -4,9 +4,9 @@ if( "ilp64" IN_LIST BLIS_FIND_COMPONENTS AND "lp64" IN_LIST BLIS_FIND_COMPONENTS
 endif()
 
 if( BLIS_PREFERS_STATIC )
-  set( BLIS_LIBRARY_NAME "libblis.a" )
+  set( BLIS_LIBRARY_NAME "libblis.a" "libblis-mt.a" )
 else()
-  set( BLIS_LIBRARY_NAME "blis" )
+  set( BLIS_LIBRARY_NAME "blis" "blis-mt")
 endif()
 
 find_library( BLIS_LIBRARIES

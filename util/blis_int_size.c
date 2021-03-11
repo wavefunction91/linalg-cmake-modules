@@ -30,7 +30,7 @@ void bli_thread_range_sub
        thrinfo_t* thread,
        dim_t      n,
        dim_t      bf,
-       bool       handle_edge_low,
+       bool_t     handle_edge_low,
        dim_t*     start,
        dim_t*     end
      ){ }
@@ -67,7 +67,7 @@ void bli_obj_scalar_detach
        obj_t* a,
        obj_t* alpha
      ){ }
-bool bli_obj_imag_is_zero( obj_t* a ){ }
+bool_t bli_obj_imag_is_zero( obj_t* a ){ }
 double round( double x) {}
 
 int main() {
