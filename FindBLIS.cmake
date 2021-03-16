@@ -35,7 +35,7 @@ endif()
 if( BLIS_INCLUDE_DIR )
 
   try_run( BLIS_USES_LP64
-           _blis_idx_test_compile_result
+           BLIS_TEST_COMPILES
            ${CMAKE_CURRENT_BINARY_DIR}
     SOURCES ${CMAKE_CURRENT_LIST_DIR}/util/blis_int_size.c
     CMAKE_FLAGS -DINCLUDE_DIRECTORIES:STRING=${BLIS_INCLUDE_DIR}
@@ -43,7 +43,29 @@ if( BLIS_INCLUDE_DIR )
     COMPILE_OUTPUT_VARIABLE _blis_idx_compile_output
     RUN_OUTPUT_VARIABLE     _blis_idx_run_output
   )
-  #message( STATUS "${_blis_idx_compile_output}" )
+
+  if( NOT BLIS_TEST_COMPILES )
+    if( ${_blis_idx_compile_output} MATCHES "pthread_" )
+      find_dependency( Threads )
+      list( APPEND BLIS_LIBRARIES Threads::Threads )
+    endif()
+    if( ${_blis_idx_compile_output} MATCHES "omp_" )
+      find_dependency( OpenMP )
+      list( APPEND BLIS_LIBRARIES OpenMP::OpenMP_C )
+    endif()
+  endif()
+
+  try_run( BLIS_USES_LP64
+           BLIS_TEST_COMPILES
+           ${CMAKE_CURRENT_BINARY_DIR}
+    SOURCES ${CMAKE_CURRENT_LIST_DIR}/util/blis_int_size.c
+    CMAKE_FLAGS -DINCLUDE_DIRECTORIES:STRING=${BLIS_INCLUDE_DIR}
+    LINK_LIBRARIES ${BLIS_LIBRARIES}
+    COMPILE_OUTPUT_VARIABLE _blis_idx_compile_output
+    RUN_OUTPUT_VARIABLE     _blis_idx_run_output
+  )
+
+
   if( ${BLIS_USES_LP64} EQUAL 0 )
     set( BLIS_USES_LP64 TRUE )
   else()
