@@ -39,10 +39,11 @@ if( BLIS_INCLUDE_DIR )
            ${CMAKE_CURRENT_BINARY_DIR}
     SOURCES ${CMAKE_CURRENT_LIST_DIR}/util/blis_int_size.c
     CMAKE_FLAGS -DINCLUDE_DIRECTORIES:STRING=${BLIS_INCLUDE_DIR}
+    LINK_LIBRARIES ${BLIS_LIBRARIES}
     COMPILE_OUTPUT_VARIABLE _blis_idx_compile_output
     RUN_OUTPUT_VARIABLE     _blis_idx_run_output
   )
-
+  #message( STATUS "${_blis_idx_compile_output}" )
   if( ${BLIS_USES_LP64} EQUAL 0 )
     set( BLIS_USES_LP64 TRUE )
   else()

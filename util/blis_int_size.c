@@ -1,3 +1,4 @@
+#if 0
 //#define BLIS_PARAM_MACRO_DEFS_H
 //#define BLIS_OBJ_MACRO_DEFS_H
 //#define BLIS_MISC_MACRO_DEFS_H
@@ -75,3 +76,11 @@ int main() {
   if( blis_int_size == 32 ) return 0;
   else                      return 1;
 }
+#else
+#include <blis/blis.h>
+int main() {
+  int blis_int_size = BLIS_BLAS_INT_TYPE_SIZE;
+  if( blis_int_size == 32 ) return 0;
+  else                      return 1;
+}
+#endif
