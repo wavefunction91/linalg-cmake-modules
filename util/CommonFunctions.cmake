@@ -177,7 +177,7 @@ function( append_possibly_missing_libs _linker_test __compile_output _orig_libs 
     list( APPEND _tmp_libs Threads::Threads )
   endif()
   
-  if( ${__compile_output} MATCHES "logf" )
+  if( ${__compile_output} MATCHES "logf" OR ${__compile_output} MATCHES "sqrt" )
     message( STATUS 
             "  * Missing LIBM            - Adding to ${_linker_test} linker" )
     list( APPEND _tmp_libs "m" )
