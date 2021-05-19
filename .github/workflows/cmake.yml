@@ -212,8 +212,8 @@ jobs:
       run: |
            sudo make -C .github/workflows/linalg download/intel-mkl
            sudo make -C .github/workflows/linalg install/intel-mkl
-           sudo make -C .github/workflows/linalg download/blis-lp64-sequential
-           sudo make -C .github/workflows/linalg install/blis-lp64-sequential
+           sudo make -C .github/workflows/linalg download/blis/lp64-sequential
+           sudo make -C .github/workflows/linalg install/blis/lp64-sequential
     
     - name: Check BLA_STATIC
       run: |
