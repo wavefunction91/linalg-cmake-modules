@@ -5,7 +5,7 @@ on: [pull_request]
 
 jobs:
   linux-check-all-libs:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-18.04
     strategy:
       matrix:
         linalg_lib: [blis,openblas,netlib,intel-mkl]
@@ -193,7 +193,7 @@ jobs:
                  ${{matrix.linalg_lib}} ${{matrix.thread}} ${{matrix.int_interface}} ${{matrix.mpi_dist}}
 
   check-kitware-compatability:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-18.04
     env:
       MKLROOT: /opt/intel/mkl
       CMAKE_PREFIX_PATH: '/home/software/install/blis-lp64-sequential;/home/software/install/netlib-lp64-sequential'
