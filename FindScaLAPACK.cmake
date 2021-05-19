@@ -53,6 +53,7 @@ foreach( _comp ${ScaLAPACK_FIND_COMPONENTS} )
   endif()
 endforeach()
 
+emulate_kitware_linalg_modules( ScaLAPACK )
 fill_out_prefix( ScaLAPACK )
 
 if( NOT ScaLAPACK_PREFERENCE_LIST )

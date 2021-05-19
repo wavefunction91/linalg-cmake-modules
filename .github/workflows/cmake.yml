@@ -191,3 +191,38 @@ jobs:
            .github/workflows/scripts/check_scalapack_cmake_cache.sh \
                  ${{runner.workspace}}/build-findscalapack-${{matrix.int_interface}} \
                  ${{matrix.linalg_lib}} ${{matrix.thread}} ${{matrix.int_interface}} ${{matrix.mpi_dist}}
+
+  check-kitware-compatability:
+    runs-on: ubuntu-latest
+    env:
+      MKLROOT: /opt/intel/mkl
+      CMAKE_PREFIX_PATH: '/home/software/install/blis-lp64-sequential;/home/software/install/netlib-lp64-sequential'
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Ubuntu Setup
+      run: |
+           sudo apt-get -yq update && sudo apt-get install make wget curl libomp5
+           sudo make -C .github/workflows/linalg install/main
+           sudo make -C .github/workflows/linalg install/cmake
+           sudo apt-get clean
+           sudo make -C .github/workflows/linalg apt-add-repository/intel-mkl
+
+    - name: Build Linalg
+      run: |
+           sudo make -C .github/workflows/linalg download/intel-mkl
+           sudo make -C .github/workflows/linalg install/intel-mkl
+           sudo make -C .github/workflows/linalg download/blis-lp64-sequential
+           sudo make -C .github/workflows/linalg install/blis-lp64-sequential
+    
+    - name: Check BLA_STATIC
+      run: |
+           cmake -H${GITHUB_WORKSPACE}/examples/blas/lp64 \
+                 -B${{runner.workspace}}/check-bla-static \
+                 -DCMAKE_MODULE_PATH=${GITHUB_WORKSPACE}  \
+                 -DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH} \
+                 -DBLAS_THREAD_LAYER=sequential \
+                 -DBLA_STATIC=ON
+           .github/workflows/scripts/check_blas_cmake_cache.sh \
+                 ${{runner.workspace}}/check-bla-static \
+                 intel-mkl sequential lp64
