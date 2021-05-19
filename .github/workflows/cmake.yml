@@ -226,3 +226,15 @@ jobs:
            .github/workflows/scripts/check_blas_cmake_cache.sh \
                  ${{runner.workspace}}/check-bla-static \
                  intel-mkl sequential lp64
+
+    - name: Check BLA_VENDOR
+      run: |
+           cmake -H${GITHUB_WORKSPACE}/examples/blas/lp64 \
+                 -B${{runner.workspace}}/check-bla-vendor \
+                 -DCMAKE_MODULE_PATH=${GITHUB_WORKSPACE}  \
+                 -DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH} \
+                 -DBLAS_THREAD_LAYER=sequential \
+                 -DBLA_VENDOR="BLIS"
+           .github/workflows/scripts/check_blas_cmake_cache.sh \
+                 ${{runner.workspace}}/check-bla-vendor \
+                 blis sequential lp64
