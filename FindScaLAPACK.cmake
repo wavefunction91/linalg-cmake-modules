@@ -31,6 +31,10 @@
 
 cmake_minimum_required( VERSION 3.17 ) # Require CMake 3.17+
 
+include( CMakePushCheckState )
+include( CheckLibraryExists )
+include( CheckSymbolExists )
+include( FindPackageHandleStandardArgs )
 include( CMakeFindDependencyMacro )
 
 include( ${CMAKE_CURRENT_LIST_DIR}/util/CommonFunctions.cmake    )
