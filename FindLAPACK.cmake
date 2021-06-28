@@ -1,4 +1,4 @@
-cmake_minimum_required( VERSION 3.11 ) # Require CMake 3.11+
+cmake_minimum_required( VERSION 3.17 ) # Require CMake 3.17+
 
 include( CMakePushCheckState )
 include( CheckLibraryExists )
@@ -8,7 +8,8 @@ include( FindPackageHandleStandardArgs )
 
 
 include( ${CMAKE_CURRENT_LIST_DIR}/util/CommonFunctions.cmake )
-include( ${CMAKE_CURRENT_LIST_DIR}/util/LAPACKUtilities.cmake   )
+include( ${CMAKE_CURRENT_LIST_DIR}/util/LAPACKUtilities.cmake )
+include( ${CMAKE_CURRENT_LIST_DIR}/LinAlgModulesMacros.cmake  )
 
 # SANITY CHECK
 if( "ilp64" IN_LIST LAPACK_FIND_COMPONENTS AND "lp64" IN_LIST LAPACK_FIND_COMPONENTS )
@@ -25,16 +26,18 @@ foreach( _comp ${LAPACK_FIND_COMPONENTS} )
   endif()
 endforeach()
 
+emulate_kitware_linalg_modules( LAPACK )
 fill_out_prefix( LAPACK )
 
 if( NOT LAPACK_PREFERENCE_LIST )
-  set( LAPACK_PREFERENCE_LIST "ReferenceLAPACK" )
+	set( LAPACK_PREFERENCE_LIST "ReferenceLAPACK" "FLAME" )
 endif()
 
 if( NOT LAPACK_LIBRARIES )
 
   # Find BLAS
   if( NOT TARGET BLAS::BLAS )
+    copy_meta_data( LAPACK BLAS )	  
     find_dependency( BLAS 
       COMPONENTS          ${LAPACK_REQUIRED_COMPONENTS} 
       OPTIONAL_COMPONENTS ${LAPACK_OPTIONAL_COMPONENTS} 
@@ -44,7 +47,7 @@ if( NOT LAPACK_LIBRARIES )
   # Check if BLAS contains a LAPACK linker
   message( STATUS "LAPACK_LIBRARIES Not Given: Checking for LAPACK in BLAS" )
   set( LAPACK_LIBRARIES           ${BLAS_LIBRARIES}           )
-  set( LAPACK_INCLUDE_DIR         ${BLAS_INCLUDE_DIR}         )
+  set( LAPACK_INCLUDE_DIRS        ${BLAS_INCLUDE_DIRS}        )
   set( LAPACK_COMPILE_DEFINITIONS ${BLAS_COMPILE_DEFINITIONS} )
   check_dpstrf_exists( LAPACK_LIBRARIES 
     BLAS_HAS_LAPACK LAPACK_FORTRAN_LOWER LAPACK_FORTRAN_UNDERSCORE
@@ -55,10 +58,11 @@ if( NOT LAPACK_LIBRARIES )
   if( BLAS_HAS_LAPACK )
 
     message( STATUS "BLAS Has A Full LAPACK Linker" )
-    set( LAPACK_VENDOR  ${BLAS_VENDOR}  )
-    set( LAPACK_IS_LP64 ${BLAS_IS_LP64} )
-    set( LAPACK_blacs_FOUND ${BLAS_blacs_FOUND} )
+    set( LAPACK_VENDOR          ${BLAS_VENDOR}          )
+    set( LAPACK_IS_LP64         ${BLAS_IS_LP64}         )
+    set( LAPACK_blacs_FOUND     ${BLAS_blacs_FOUND}     )
     set( LAPACK_scalapack_FOUND ${BLAS_scalapack_FOUND} )
+    set( LAPACK_sycl_FOUND      ${BLAS_sycl_FOUND}      )
 
   # Else find LAPACK installation consistent with BLAS
   else( BLAS_HAS_LAPACK )
@@ -93,6 +97,7 @@ if( NOT LAPACK_LIBRARIES )
         #set( LAPACK_headers_FOUND   ${${lapack_type}_headers_FOUND}   )
         set( LAPACK_blacs_FOUND     ${${lapack_type}_blacs_FOUND}     )
         set( LAPACK_scalapack_FOUND ${${lapack_type}_scalapack_FOUND} )
+        set( LAPACK_sycl_FOUND      ${${lapack_type}_sycl_FOUND}      )
 
         break() # Break from search loop
 
@@ -101,7 +106,8 @@ if( NOT LAPACK_LIBRARIES )
     endforeach()
   endif( BLAS_HAS_LAPACK )
 
-
+else()
+  find_linalg_dependencies( LAPACK_LIBRARIES )
 endif()
 
 # Handle implicit LAPACK linkage
@@ -137,6 +143,8 @@ if( LAPACK_LINK_OK )
   else()
     set( LAPACK_lp64_FOUND  FALSE )
     set( LAPACK_ilp64_FOUND TRUE  )
+    find_dependency( ILP64 )
+    list( APPEND LAPACK_COMPILE_OPTIONS "${ILP64_COMPILE_OPTIONS}" )
   endif()
 
 else()
@@ -155,10 +163,22 @@ find_package_handle_standard_args( LAPACK
   HANDLE_COMPONENTS
 )
 
+# Cache variables
+if( LAPACK_FOUND )
+  set( LAPACK_VENDOR              "${LAPACK_VENDOR}"              CACHE STRING "LAPACK Vendor"              FORCE )
+  set( LAPACK_IS_LP64             "${LAPACK_IS_LP64}"             CACHE STRING "LAPACK LP64 Flag"           FORCE )
+  set( LAPACK_LIBRARIES           "${LAPACK_LIBRARIES}"           CACHE STRING "LAPACK Libraries"           FORCE )
+  set( LAPACK_COMPILE_DEFINITIONS "${LAPACK_COMPILE_DEFINITIONS}" CACHE STRING "LAPACK Compile Definitions" FORCE )
+  set( LAPACK_INCLUDE_DIRS        "${LAPACK_INCLUDE_DIRS}"        CACHE STRING "LAPACK Include Directories" FORCE )
+  set( LAPACK_COMPILE_OPTIONS     "${LAPACK_COMPILE_OPTIONS}"     CACHE STRING "LAPACK Compile Options"     FORCE )
+endif()
+
 if( LAPACK_FOUND AND NOT TARGET LAPACK::LAPACK )
   
   add_library( LAPACK::LAPACK INTERFACE IMPORTED )
   set_target_properties( LAPACK::LAPACK PROPERTIES
+    INTERFACE_INCLUDE_DIRECTORIES "${LAPACK_INCLUDE_DIRS}"
+    INTERFACE_COMPILE_OPTIONS     "${LAPACK_COMPILE_OPTIONS}"
     INTERFACE_COMPILE_DEFINITIONS "${LAPACK_COMPILE_DEFINITIONS}"
     INTERFACE_LINK_LIBRARIES      "${LAPACK_LIBRARIES}"
   )

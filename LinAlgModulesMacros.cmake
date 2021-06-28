@@ -1,5 +1,20 @@
 set( LINALG_MACROS_DIR ${CMAKE_CURRENT_LIST_DIR} )
 
+macro( find_linalg_dependencies _libs )
+  include( CMakeFindDependencyMacro )
+  foreach( _lib ${${_libs}} )
+    if (${_lib} MATCHES "OpenMP")
+      find_dependency(OpenMP)
+    elseif (${_lib} MATCHES "Threads")
+      find_dependency(Threads)
+    elseif (${_lib} MATCHES "tbb")
+      find_dependency(TBB)
+    elseif (${_lib} MATCHES "MPI")
+      find_dependency(MPI)  
+    endif()
+  endforeach()
+endmacro()
+
 function( install_linalg_modules _dest_dir )
 
 set( LINALG_FIND_MODULES
@@ -12,7 +27,10 @@ set( LINALG_FIND_MODULES
      FindReferenceBLAS.cmake
      FindReferenceLAPACK.cmake
      FindReferenceScaLAPACK.cmake
-     FindScaLAPACK.cmake 
+     FindScaLAPACK.cmake
+     FindILP64.cmake
+     FindTBB.cmake
+     FindStandardFortran.cmake
      LinAlgModulesMacros.cmake
 )
 
@@ -30,21 +48,19 @@ set( LINALG_UTIL_FILES
      util/LAPACKUtilities.cmake
      util/ScaLAPACKUtilities.cmake )
 
-list( TRANSFORM LINALG_FIND_MODULES 
+list( TRANSFORM LINALG_FIND_MODULES
       PREPEND   ${LINALG_MACROS_DIR}/ )
 list( TRANSFORM LINALG_UTIL_FILES
       PREPEND   ${LINALG_MACROS_DIR}/ )
 
-install( 
-  FILES ${LINALG_FIND_MODULES} 
+install(
+  FILES ${LINALG_FIND_MODULES} ${LINALG_MACROS_DIR}/LICENSE.txt
   DESTINATION ${${_dest_dir}}/linalg-cmake-modules
 )
 
-install( 
+install(
   FILES ${LINALG_UTIL_FILES}
   DESTINATION ${${_dest_dir}}/linalg-cmake-modules/util
 )
-    
-       
 
 endfunction()

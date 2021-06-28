@@ -36,6 +36,7 @@ if( IntelMKL_PREFERS_STATIC )
   set( IntelMKL_OMP_PGI_LIBRARY_NAME    "libmkl_pgi_thread.a"   )
   set( IntelMKL_TBB_LIBRARY_NAME        "libmkl_tbb_thread.a"   )
   set( IntelMKL_CORE_LIBRARY_NAME       "libmkl_core.a"         )
+  set( IntelMKL_SYCL_LIBRARY_NAME       "libmkl_sycl.a"         )
 
   set( IntelMKL_LP64_ScaLAPACK_LIBRARY_NAME  "libmkl_scalapack_lp64.a"  )
   set( IntelMKL_ILP64_ScaLAPACK_LIBRARY_NAME "libmkl_scalapack_ilp64.a" )
@@ -55,6 +56,7 @@ else()
   set( IntelMKL_OMP_PGI_LIBRARY_NAME    "mkl_pgi_thread"   )
   set( IntelMKL_TBB_LIBRARY_NAME        "mkl_tbb_thread"   )
   set( IntelMKL_CORE_LIBRARY_NAME       "mkl_core"         )
+  set( IntelMKL_SYCL_LIBRARY_NAME       "mkl_sycl"         )
 
   set( IntelMKL_LP64_ScaLAPACK_LIBRARY_NAME  "mkl_scalapack_lp64"  )
   set( IntelMKL_ILP64_ScaLAPACK_LIBRARY_NAME "mkl_scalapack_ilp64" )
@@ -193,8 +195,6 @@ find_library( IntelMKL_CORE_LIBRARY
   DOC "Intel(R) MKL CORE Library"
 )
 
-
-
 # Check version
 if( EXISTS ${IntelMKL_INCLUDE_DIR}/mkl_version.h )
   set( version_pattern 
@@ -253,6 +253,16 @@ else()
   set( IntelMKL_lp64_FOUND FALSE )
 endif()
 
+# SYCL
+if( "sycl" IN_LIST IntelMKL_FIND_COMPONENTS )
+  find_library( IntelMKL_SYCL_LIBRARY
+    NAMES ${IntelMKL_SYCL_LIBRARY_NAME}
+    HINTS ${IntelMKL_PREFIX}
+    PATHS ${IntelMKL_LIBRARY_DIR} ${CMAKE_C_IMPLICIT_LINK_DIRECTORIES}
+    PATH_SUFFIXES lib/intel64 lib/ia32
+    DOC "Intel(R) MKL SYCL Library"
+  )
+endif() 
 
 
 # BLACS / ScaLAPACK
@@ -293,13 +303,8 @@ find_library( IntelMKL_LP64_ScaLAPACK_LIBRARY
 
 # Default to LP64
 if( "ilp64" IN_LIST IntelMKL_FIND_COMPONENTS )
+
   set( IntelMKL_COMPILE_DEFINITIONS "MKL_ILP64" )
-  if( CMAKE_C_COMPILER_ID MATCHES "GNU" )
-    set( IntelMKL_C_COMPILE_FLAGS        "-m64" )
-    set( IntelMKL_Fortran_COMPILE_FLAGS  "-m64" "-fdefault-integer-8" )
-  elseif( CMAKE_C_COMPILER_ID MATCHES "PGI" )
-    set( IntelMKL_Fortran_COMPILE_FLAGS "-i8" )
-  endif()
   set( IntelMKL_LIBRARY ${IntelMKL_ILP64_LIBRARY} )
 
   if( IntelMKL_ILP64_BLACS_LIBRARY )
@@ -326,7 +331,9 @@ else()
   endif()
 endif()
 
-
+if( IntelMKL_SYCL_LIBRARY )
+  set( IntelMKL_sycl_FOUND TRUE )
+endif()
 
 
 
@@ -344,6 +351,10 @@ if( IntelMKL_LIBRARY AND IntelMKL_THREAD_LIBRARY AND IntelMKL_CORE_LIBRARY )
        ${IntelMKL_LIBRARY} 
        ${IntelMKL_THREAD_LIBRARY} 
        ${IntelMKL_CORE_LIBRARY} )
+
+  if( "sycl" IN_LIST IntelMKL_FIND_COMPONENTS )
+    list( APPEND IntelMKL_BLAS_LAPACK_LIBRARIES ${IntelMKL_SYCL_LIBRARY} )
+  endif()
 
   if( "blacs" IN_LIST IntelMKL_FIND_COMPONENTS )
     set( IntelMKL_BLACS_LIBRARIES 
@@ -403,19 +414,25 @@ if( IntelMKL_LIBRARY AND IntelMKL_THREAD_LIBRARY AND IntelMKL_CORE_LIBRARY )
   elseif( IntelMKL_THREAD_LAYER MATCHES "tbb" )
 
     if( NOT TARGET tbb )
-      message( FATAL_ERROR "TBB Bindings Not Currently Accessible Through FindIntelMKL" )
+	    #message( FATAL_ERROR "TBB Bindings Not Currently Accessible Through FindIntelMKL" )
       find_dependency( TBB )
     endif()
 
-    list( APPEND IntelMKL_BLAS_LAPACK_LIBRARIES tbb )
+    set( _mkl_tbb_extra_libs tbb )
+    if( IntelMKL_PREFERS_STATIC )
+      list( APPEND _mkl_tbb_extra_libs "stdc++" ) 
+    endif()
+    list( APPEND IntelMKL_BLAS_LAPACK_LIBRARIES ${_mkl_tbb_extra_libs} )
 
     if( IntelMKL_BLACS_LIBRARIES )
-      list( APPEND IntelMKL_BLACS_LIBRARIES tbb )
+      list( APPEND IntelMKL_BLACS_LIBRARIES ${_mkl_tbb_extra_libs} )
     endif()
 
     if( IntelMKL_ScaLAPACK_LIBRARIES )
-      list( APPEND IntelMKL_ScaLAPACK_LIBRARIES tbb )
+      list( APPEND IntelMKL_ScaLAPACK_LIBRARIES ${_mkl_tbb_extra_libs} )
     endif()
+
+    unset( _mkl_tbb_extra_libs )
 
   endif()
 
@@ -454,22 +471,30 @@ find_package_handle_standard_args( IntelMKL
   HANDLE_COMPONENTS
 )
 
-#if( IntelMKL_FOUND AND NOT TARGET IntelMKL::mkl )
-#
-#  add_library( IntelMKL::mkl INTERFACE IMPORTED )
-#  set_target_properties( IntelMKL::mkl PROPERTIES
-#    INTERFACE_INCLUDE_DIRECTORIES "${IntelMKL_INCLUDE_DIR}"
-#    INTERFACE_LINK_LIBRARIES      "${IntelMKL_LIBRARIES}"
-#    INTERFACE_COMPILE_OPTIONS     "${IntelMKL_C_COMPILE_FLAGS}"
-#    INTERFACE_COMPILE_DEFINITIONS "${IntelMKL_COMPILE_DEFINITIONS}"
-#  )
-#
-#  if( "scalapack" IN_LIST IntelMKL_FIND_COMPONENTS AND NOT scalapack_LIBRARIES )
-#    set( scalapack_LIBRARIES IntelMKL::mkl )
-#  endif()
-#
-#  if( "blacs" IN_LIST IntelMKL_FIND_COMPONENTS AND NOT blacs_LIBRARIES )
-#    set( blacs_LIBRARIES IntelMKL::mkl )
-#  endif()
-#
-#endif()
+if( IntelMKL_FOUND )
+
+  if( IntelMKL_BLAS_LAPACK_LIBRARIES AND NOT TARGET IntelMKL::IntelMKL )
+    add_library( IntelMKL::IntelMKL INTERFACE IMPORTED )
+    set_target_properties( IntelMKL::IntelMKL PROPERTIES
+      INTERFACE_INCLUDE_DIRECTORIES "${IntelMKL_INCLUDE_DIR}"
+      INTERFACE_LINK_LIBRARIES      "${IntelMKL_BLAS_LAPACK_LIBRARIES}"
+    )
+  endif()
+
+  if( IntelMKL_BLACS_LIBRARIES AND NOT TARGET IntelMKL::BLACS )
+    add_library( IntelMKL::BLACS INTERFACE IMPORTED )
+    set_target_properties( IntelMKL::BLACS PROPERTIES
+      INTERFACE_INCLUDE_DIRECTORIES "${IntelMKL_INCLUDE_DIR}"
+      INTERFACE_LINK_LIBRARIES      "${IntelMKL_BLACS_LIBRARIES}"
+    )
+  endif()
+
+  if( IntelMKL_ScaLAPACK_LIBRARIES AND NOT TARGET IntelMKL::ScaLAPACK )
+    add_library( IntelMKL::ScaLAPACK INTERFACE IMPORTED )
+    set_target_properties( IntelMKL::ScaLAPACK PROPERTIES
+      INTERFACE_INCLUDE_DIRECTORIES "${IntelMKL_INCLUDE_DIR}"
+      INTERFACE_LINK_LIBRARIES      "${IntelMKL_ScaLAPACK_LIBRARIES}"
+    )
+  endif()
+
+endif()

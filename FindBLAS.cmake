@@ -1,13 +1,15 @@
-cmake_minimum_required( VERSION 3.11 ) # Require CMake 3.11+
+cmake_minimum_required( VERSION 3.17 ) # Require CMake 3.17+
 
 include( CMakePushCheckState )
 include( CheckLibraryExists )
 include( CheckSymbolExists )
 include( FindPackageHandleStandardArgs )
+include( CMakeFindDependencyMacro )
 
 
 include( ${CMAKE_CURRENT_LIST_DIR}/util/CommonFunctions.cmake )
 include( ${CMAKE_CURRENT_LIST_DIR}/util/BLASUtilities.cmake   )
+include( ${CMAKE_CURRENT_LIST_DIR}/LinAlgModulesMacros.cmake  )
 
 # SANITY CHECK: Make sure only one integer interface is requested
 if( "ilp64" IN_LIST BLAS_FIND_COMPONENTS AND "lp64" IN_LIST BLAS_FIND_COMPONENTS )
@@ -24,10 +26,14 @@ foreach( _comp ${BLAS_FIND_COMPONENTS} )
   endif()
 endforeach()
 
+emulate_kitware_linalg_modules( BLAS )
 fill_out_prefix( BLAS )
 
 if( NOT BLAS_PREFERENCE_LIST )
   set( BLAS_PREFERENCE_LIST "IntelMKL" "IBMESSL" "BLIS" "OpenBLAS" "ReferenceBLAS" )
+  if( CMAKE_SYSTEM_NAME MATCHES "Darwin" )
+    list( PREPEND BLAS_PREFERENCE_LIST "Accelerate" )
+  endif()
 endif()
 
 if( NOT BLAS_LIBRARIES )
@@ -49,11 +55,12 @@ if( NOT BLAS_LIBRARIES )
       set( BLAS_VENDOR              "${blas_type}"                        )
       set( BLAS_LIBRARIES           "${${blas_type}_LIBRARIES}"           )
       set( BLAS_COMPILE_DEFINITIONS "${${blas_type}_COMPILE_DEFINITIONS}" )
-      set( BLAS_INCLUDE_DIR         "${${blas_type}_INCLUDE_DIR}"         )
-
+      set( BLAS_INCLUDE_DIRS        "${${blas_type}_INCLUDE_DIR}"         )
+      set( BLAS_COMPILE_OPTIONS     "${${blas_type}_COMPILE_OPTIONS}"     )
 
       # Generic Components
       #set( BLAS_headers_FOUND   ${${blas_type}_headers_FOUND}   )
+      set( BLAS_sycl_FOUND      ${${blas_type}_sycl_FOUND}      )
       set( BLAS_blacs_FOUND     ${${blas_type}_blacs_FOUND}     )
       set( BLAS_scalapack_FOUND ${${blas_type}_scalapack_FOUND} )
 
@@ -63,6 +70,8 @@ if( NOT BLAS_LIBRARIES )
 
   endforeach()
 
+else()
+  find_linalg_dependencies( BLAS_LIBRARIES )
 endif()
 
 
@@ -95,6 +104,8 @@ if( BLAS_LINK_OK )
   else()
     set( BLAS_lp64_FOUND  FALSE )
     set( BLAS_ilp64_FOUND TRUE  )
+    find_dependency( ILP64 )
+    list( APPEND BLAS_COMPILE_OPTIONS "${ILP64_COMPILE_OPTIONS}" )
   endif()
 
 endif()
@@ -105,11 +116,22 @@ find_package_handle_standard_args( BLAS
   HANDLE_COMPONENTS
 )
 
+# Cache variables
+if( BLAS_FOUND )
+  set( BLAS_VENDOR              "${BLAS_VENDOR}"              CACHE STRING "BLAS Vendor"              FORCE )
+  set( BLAS_IS_LP64             "${BLAS_IS_LP64}"             CACHE STRING "BLAS LP64 Flag"           FORCE )
+  set( BLAS_LIBRARIES           "${BLAS_LIBRARIES}"           CACHE STRING "BLAS Libraries"           FORCE )
+  set( BLAS_COMPILE_DEFINITIONS "${BLAS_COMPILE_DEFINITIONS}" CACHE STRING "BLAS Compile Definitions" FORCE )
+  set( BLAS_INCLUDE_DIRS        "${BLAS_INCLUDE_DIRS}"        CACHE STRING "BLAS Include Directories" FORCE )
+  set( BLAS_COMPILE_OPTIONS     "${BLAS_COMPILE_OPTIONS}"     CACHE STRING "BLAS Compile Options"     FORCE )
+endif()
 
 if( BLAS_FOUND AND NOT TARGET BLAS::BLAS )
   
   add_library( BLAS::BLAS INTERFACE IMPORTED )
   set_target_properties( BLAS::BLAS PROPERTIES
+    INTERFACE_INCLUDE_DIRECTORIES "${BLAS_INCLUDE_DIRS}"
+    INTERFACE_COMPILE_OPTIONS     "${BLAS_COMPILE_OPTIONS}"
     INTERFACE_COMPILE_DEFINITIONS "${BLAS_COMPILE_DEFINITIONS}"
     INTERFACE_LINK_LIBRARIES      "${BLAS_LIBRARIES}"
   )

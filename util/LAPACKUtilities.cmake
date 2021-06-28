@@ -37,26 +37,10 @@ foreach( _uplo LOWER UPPER )
 
     else()
 
-      #message( STATUS ${_compile_output} )
+      append_possibly_missing_libs( LAPACK _compile_output ${_libs} _new_libs )
+      list( APPEND ${_libs} ${_new_libs} )
+      set( ${_libs} ${${_libs}} PARENT_SCOPE )
 
-      # Check for GFORTRAN
-      if( _compile_output MATCHES "_gfortran" )
-
-        message( STATUS "  * Mising GFORTRAN - Adding TO LAPACK LINKER" )
-
-        list( APPEND ${_libs} "gfortran" )
-        set( ${_libs} ${${_libs}} PARENT_SCOPE )
-
-      endif()
-
-      if( _compile_output MATCHES "logf" )
-
-        message( STATUS "  * Mising LIBM - Adding TO LAPACK LINKER" )
-
-        list( APPEND ${_libs} "m" )
-        set( ${_libs} ${${_libs}} PARENT_SCOPE )
-
-      endif()
 
       # Recheck Compiliation
       check_function_exists_w_results( 
@@ -107,9 +91,7 @@ try_run( _run_result _compile_result ${CMAKE_CURRENT_BINARY_DIR}
   RUN_OUTPUT_VARIABLE     _run_output
 )
 
-#message( STATUS ${_run_result} )
-
-if( ${_run_result} EQUAL 0 )
+if( _run_output MATCHES "LAPACK IS LP64" )
   set( ${_libs_are_lp64} TRUE PARENT_SCOPE )
 else()
   set( ${_libs_are_lp64} FALSE PARENT_SCOPE )

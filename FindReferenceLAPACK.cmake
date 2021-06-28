@@ -46,7 +46,6 @@ else()
   set( ReferenceLAPACK_LIBRARIES ${ReferenceLAPACK_LP64_LIBRARIES} )
 endif()
 
-
 include(FindPackageHandleStandardArgs)
 find_package_handle_standard_args( ReferenceLAPACK
   REQUIRED_VARS ReferenceLAPACK_LIBRARIES

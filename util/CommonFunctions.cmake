@@ -44,6 +44,28 @@
 
 set( COMMON_UTILITY_CMAKE_FILE_DIR ${CMAKE_CURRENT_LIST_DIR} )
 
+function( emulate_kitware_linalg_modules name )
+
+  if( DEFINED BLA_STATIC AND NOT DEFINED ${name}_PREFERS_STATIC )
+    if( DEFINED CACHE{BLA_STATIC} )
+      set( ${name}_PREFERS_STATIC ${BLA_STATIC} CACHE BOOL 
+        "Use Static ${name} LIBRARIES" )
+    else()
+      set( ${name}_PREFERS_STATIC ${BLA_STATIC} PARENT_SCOPE )
+    endif()
+  endif()
+
+  if( DEFINED BLA_VENDOR AND NOT DEFINED ${name}_PREFERENCE_LIST )
+    if( DEFINED CACHE{BLA_VENDOR} )
+      set( ${name}_PREFERENCE_LIST ${BLA_VENDOR} CACHE BOOL 
+        "Use Static ${name} LIBRARIES" )
+    else()
+      set( ${name}_PREFERENCE_LIST ${BLA_VENDOR} PARENT_SCOPE )
+    endif()
+  endif()
+
+endfunction()
+
 function( fill_out_prefix name )
 
   #if( ${name}_PREFIX AND NOT ${name}_INCLUDE_DIR )
@@ -61,9 +83,9 @@ endfunction()
 
 function( copy_meta_data _src _dest )
 
-  if( ${_src}_LIBRARIES AND NOT ${_dest}_LIBRARIES )
-    set( ${_dest}_LIBRARIES ${${_src}_LIBRARIES} PARENT_SCOPE )
-  endif()
+	#if( ${_src}_LIBRARIES AND NOT ${_dest}_LIBRARIES )
+  	#  set( ${_dest}_LIBRARIES ${${_src}_LIBRARIES} PARENT_SCOPE )
+  	#endif()
 
   if( ${_src}_PREFIX AND NOT ${_dest}_PREFIX )
     set( ${_dest}_PREFIX ${${_src}_PREFIX} PARENT_SCOPE )
@@ -75,6 +97,14 @@ function( copy_meta_data _src _dest )
 
   if( ${_src}_LIBRARY_DIR AND NOT ${_dest}_LIBRARY_DIR )
     set( ${_dest}_LIBRARY_DIR ${${_src}_LIBRARY_DIR} PARENT_SCOPE )
+  endif()
+
+  if( ${_src}_PREFERS_STATIC AND NOT ${_dest}_PREFERS_STATIC )
+    set( ${_dest}_PREFERS_STATIC  ${${_src}_PREFERS_STATIC} PARENT_SCOPE )
+  endif()
+
+  if( ${_src}_THREAD_LAYER AND NOT ${_dest}_THREAD_LAYER )
+    set( ${_dest}_THREAD_LAYER  ${${_src}_THREAD_LAYER} PARENT_SCOPE )
   endif()
 
 endfunction()
@@ -131,5 +161,50 @@ function( check_function_exists_w_results _libs _func _output _result )
 
   set( ${_output} "${${_output}}" PARENT_SCOPE )
   set( ${_result} "${${_result}}" PARENT_SCOPE )
+
+endfunction()
+
+function( append_possibly_missing_libs _linker_test __compile_output _orig_libs __new_libs )
+
+
+  set( _tmp_libs )
+  # Check for missing Fortran symbols
+  if( ${__compile_output} MATCHES "fortran" OR ${__compile_output} MATCHES "f90_" )
+    message( STATUS 
+      "  * Missing Standard Fortran Libs - Adding to ${_linker_test} linker" )
+    # Check for Standard Fortran Libraries
+    if(NOT STANDARDFORTRAN_LIBRARIES)
+      include(CMakeFindDependencyMacro)
+      find_dependency( StandardFortran )
+    endif()
+    list( APPEND _tmp_libs "${STANDARDFORTRAN_LIBRARIES}" )
+  endif()
+  
+  
+  if( ${__compile_output} MATCHES "omp_" )
+    message( STATUS 
+      "  * Missing OpenMP                - Adding to ${_linker_test} linker" )
+    if( NOT TARGET OpenMP::OpenMP_C )
+      find_dependency( OpenMP )
+    endif()
+    list( APPEND _tmp_libs OpenMP::OpenMP_C )
+  endif()
+  
+  if( ${__compile_output} MATCHES "pthread_" )
+    message( STATUS 
+      "  * Missing PThreads              - Adding to ${_linker_test} linker" )
+    if( NOT TARGET Threads::Threads )
+      find_dependency( Threads )
+    endif()
+    list( APPEND _tmp_libs Threads::Threads )
+  endif()
+  
+  if( ${__compile_output} MATCHES "logf" OR ${__compile_output} MATCHES "sqrt" )
+    message( STATUS 
+            "  * Missing LIBM            - Adding to ${_linker_test} linker" )
+    list( APPEND _tmp_libs "m" )
+  endif()
+  
+  set( ${__new_libs} "${_tmp_libs}" PARENT_SCOPE )
 
 endfunction()
