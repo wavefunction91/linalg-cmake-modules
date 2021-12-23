@@ -46,7 +46,12 @@ if( BLIS_INCLUDE_DIR )
 
   if( NOT BLIS_TEST_COMPILES )
     if( ${_blis_idx_compile_output} MATCHES "pthread_" )
-      find_dependency( Threads )
+      if (NOT TARGET Threads::Threads)
+        find_dependency(Threads)
+        # Threads::Threads by default is not GLOBAL, so to allow users of LINALG_LIBRARIES to safely use it we need to make it global
+        # more discussion here: https://gitlab.kitware.com/cmake/cmake/-/issues/17256
+        set_target_properties(Threads::Threads PROPERTIES IMPORTED_GLOBAL TRUE)
+      endif(NOT TARGET Threads::Threads)
       list( APPEND BLIS_LIBRARIES Threads::Threads )
     endif()
     if( ${_blis_idx_compile_output} MATCHES "omp_" )

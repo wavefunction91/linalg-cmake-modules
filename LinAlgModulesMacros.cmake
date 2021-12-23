@@ -6,7 +6,12 @@ macro( find_linalg_dependencies _libs )
     if (${_lib} MATCHES "OpenMP")
       find_dependency(OpenMP)
     elseif (${_lib} MATCHES "Threads")
-      find_dependency(Threads)
+      if (NOT TARGET Threads::Threads)
+        find_dependency(Threads)
+        # Threads::Threads by default is not GLOBAL, so to allow users of LINALG_LIBRARIES to safely use it we need to make it global
+        # more discussion here: https://gitlab.kitware.com/cmake/cmake/-/issues/17256
+        set_target_properties(Threads::Threads PROPERTIES IMPORTED_GLOBAL TRUE)
+      endif(NOT TARGET Threads::Threads)
     elseif (${_lib} MATCHES "tbb")
       find_dependency(TBB)
     elseif (${_lib} MATCHES "MPI")

@@ -195,6 +195,9 @@ function( append_possibly_missing_libs _linker_test __compile_output _orig_libs 
       "  * Missing PThreads              - Adding to ${_linker_test} linker" )
     if( NOT TARGET Threads::Threads )
       find_dependency( Threads )
+      # Threads::Threads by default is not GLOBAL, so to allow users of LINALG_LIBRARIES to safely use it we need to make it global
+      # more discussion here: https://gitlab.kitware.com/cmake/cmake/-/issues/17256
+      set_target_properties(Threads::Threads PROPERTIES IMPORTED_GLOBAL TRUE)
     endif()
     list( APPEND _tmp_libs Threads::Threads )
   endif()
