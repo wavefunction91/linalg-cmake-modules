@@ -44,7 +44,7 @@ include( ${CMAKE_CURRENT_LIST_DIR}/LinAlgModulesMacros.cmake     )
 
 # SANITY CHECK
 if( "ilp64" IN_LIST ScaLAPACK_FIND_COMPONENTS AND "lp64" IN_LIST ScaLAPACK_FIND_COMPONENTS )
-  message( FATAL_ERROR "ScaLAPACK cannot link to both ILP64 and LP64 iterfaces" )
+  message( FATAL_ERROR "ScaLAPACK cannot link to both ILP64 and LP64 interfaces" )
 endif()
 
 
@@ -174,6 +174,11 @@ if( ScaLAPACK_LINK_OK )
     set( ScaLAPACK_ilp64_FOUND TRUE  )
     find_dependency( ILP64 )
     list( APPEND ScaLAPACK_COMPILE_OPTIONS "${ILP64_COMPILE_OPTIONS}" )
+    foreach ( lang C CXX Fortran )
+        if ( DEFINED ILP64_${lang}_COMPILE_OPTIONS )
+            list( APPEND ScaLAPACK_${lang}_COMPILE_OPTIONS "${ILP64_${lang}_COMPILE_OPTIONS}" )
+        endif()
+    endforeach()
   endif()
 
 else()

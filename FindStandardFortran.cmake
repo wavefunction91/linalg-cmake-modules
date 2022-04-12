@@ -9,7 +9,7 @@
 # Implemenation note.  CMake provides a variable
 # CMAKE_Fortran_IMPLICIT_LINK_LIBRARIES which is a list of all libraries a
 # compiler implicitly links against.  Unfortunately, at least for GNU, this
-# list includes a lot of extra libraries that we don't necessarilly want to
+# list includes a lot of extra libraries that we don't necessarily want to
 # link against (including both static and shared versions of libgcc).  This is
 # why we've hardcoded the list per compiler.
 #
