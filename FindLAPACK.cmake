@@ -54,7 +54,7 @@ if( NOT LAPACK_LIBRARIES )
   # also need to handle several corner cases:
   # - OpenBLAS needs libgfortran only for some functions, dpstrf is not one of them, so check for dgesvd
   check_fortran_functions_exist( "dpstrf;dgesvd" LAPACK LAPACK_LIBRARIES
-          BLAS_HAS_LAPACK LAPACK_FORTRAN_LOWER LAPACK_FORTRAN_UNDERSCORE
+          BLAS_HAS_LAPACK LAPACK_Fortran_LOWER LAPACK_Fortran_UNDERSCORE
           )
 
   # If BLAS has a full LAPACK Linker, propagate vars
@@ -125,7 +125,7 @@ if( BLAS_HAS_LAPACK )
 else()
   # see notes above the first invocation of check_fortran_functions_exist
   check_fortran_functions_exist( "dpstrf;dgesvd" LAPACK LAPACK_LIBRARIES
-          LAPACK_LINK_OK LAPACK_FORTRAN_LOWER LAPACK_FORTRAN_UNDERSCORE
+          LAPACK_LINK_OK LAPACK_Fortran_LOWER LAPACK_Fortran_UNDERSCORE
           )
 endif()
 
@@ -133,10 +133,10 @@ endif()
 if( LAPACK_LINK_OK )
 
   set( _dsyev_name "dsyev" )
-  if( NOT LAPACK_FORTRAN_LOWER )
+  if( NOT LAPACK_Fortran_LOWER )
     string( TOUPPER "${_dsyev_name}" _dsyev_name )
   endif()
-  if( LAPACK_FORTRAN_UNDERSCORE )
+  if( LAPACK_Fortran_UNDERSCORE )
     set( _dsyev_name "${_dsyev_name}_" )
   endif()
 

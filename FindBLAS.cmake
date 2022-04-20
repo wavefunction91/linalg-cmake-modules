@@ -83,17 +83,17 @@ endif()
 
 # Check if DGEMM exists in proposed BLAS_LIBRARIES
 check_fortran_functions_exist( dgemm BLAS BLAS_LIBRARIES
-                               BLAS_LINK_OK BLAS_FORTRAN_LOWER BLAS_FORTRAN_UNDERSCORE )
+                               BLAS_LINK_OK BLAS_Fortran_LOWER BLAS_Fortran_UNDERSCORE )
 
 
 # If BLAS linkage successful, check if it is ILP64/LP64
 if( BLAS_LINK_OK )
 
   set( _dgemm_name "dgemm" )
-  if( NOT BLAS_FORTRAN_LOWER )
+  if( NOT BLAS_Fortran_LOWER )
     string( TOUPPER "${_dgemm_name}" _dgemm_name )
   endif()
-  if( BLAS_FORTRAN_UNDERSCORE )
+  if( BLAS_Fortran_UNDERSCORE )
     set( _dgemm_name "${_dgemm_name}_" )
   endif()
 
