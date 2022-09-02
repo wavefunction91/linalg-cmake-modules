@@ -1,10 +1,5 @@
 cmake_minimum_required( VERSION 3.10 )
 project(lapack_test LANGUAGES C)
 
-find_package( LAPACK COMPONENTS lp64 )
-message( STATUS "LAPACK_VENDOR              = ${LAPACK_VENDOR}"              )
-message( STATUS "LAPACK_LIBRARIES           = ${LAPACK_LIBRARIES}"           )
-message( STATUS "LAPACK_COMPILE_DEFINITIONS = ${LAPACK_COMPILE_DEFINITIONS}" )
-message( STATUS "LAPACK_FORTRAN_LOWER       = ${LAPACK_FORTRAN_LOWER}"       )
-message( STATUS "LAPACK_FORTRAN_UNDERSCORE  = ${LAPACK_FORTRAN_UNDERSCORE}"  )
-message( STATUS "LAPACK_IS_LP64             = ${LAPACK_IS_LP64}"             )
+find_package( LAPACK REQUIRED COMPONENTS lp64 )
+include( ../../lapack/common.cmake )

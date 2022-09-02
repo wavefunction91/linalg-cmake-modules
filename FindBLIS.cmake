@@ -1,12 +1,12 @@
 # SANITY CHECK
 if( "ilp64" IN_LIST BLIS_FIND_COMPONENTS AND "lp64" IN_LIST BLIS_FIND_COMPONENTS )
-  message( FATAL_ERROR "BLIS cannot link to both ILP64 and LP64 iterfaces" )
+  message( FATAL_ERROR "BLIS cannot link to both ILP64 and LP64 interfaces" )
 endif()
 
 if( BLIS_PREFERS_STATIC )
-  set( BLIS_LIBRARY_NAME "libblis.a" )
+  set( BLIS_LIBRARY_NAME "libblis.a" "libblis-mt.a" )
 else()
-  set( BLIS_LIBRARY_NAME "blis" )
+  set( BLIS_LIBRARY_NAME "blis" "blis-mt")
 endif()
 
 find_library( BLIS_LIBRARIES
@@ -25,23 +25,51 @@ find_path( BLIS_INCLUDE_DIR
   DOC "BLIS header"
 )
   
-#if( BLIS_LIBRARY AND BLIS_PREFERS_STATIC )
-#  include( CMakeFindDependency )
-#  find_package( Threads QUIET )
-#  set( BLIS_LIBRARIES ${BLIS_LIBRARY} Threads::Threads "m")
-#endif()
+if( BLIS_LIBRARIES )
+  if( NOT "m" IN_LIST BLIS_LIBRARIES )
+    list( APPEND BLIS_LIBRARIES "m")
+  endif()
+endif()
 
 # check ILP64
 if( BLIS_INCLUDE_DIR )
 
   try_run( BLIS_USES_LP64
-           _blis_idx_test_compile_result
+           BLIS_TEST_COMPILES
            ${CMAKE_CURRENT_BINARY_DIR}
     SOURCES ${CMAKE_CURRENT_LIST_DIR}/util/blis_int_size.c
     CMAKE_FLAGS -DINCLUDE_DIRECTORIES:STRING=${BLIS_INCLUDE_DIR}
+    LINK_LIBRARIES ${BLIS_LIBRARIES}
     COMPILE_OUTPUT_VARIABLE _blis_idx_compile_output
     RUN_OUTPUT_VARIABLE     _blis_idx_run_output
   )
+
+  if( NOT BLIS_TEST_COMPILES )
+    if( ${_blis_idx_compile_output} MATCHES "pthread_" )
+      if (NOT TARGET Threads::Threads)
+        find_dependency(Threads)
+        # Threads::Threads by default is not GLOBAL, so to allow users of LINALG_LIBRARIES to safely use it we need to make it global
+        # more discussion here: https://gitlab.kitware.com/cmake/cmake/-/issues/17256
+        set_target_properties(Threads::Threads PROPERTIES IMPORTED_GLOBAL TRUE)
+      endif(NOT TARGET Threads::Threads)
+      list( APPEND BLIS_LIBRARIES Threads::Threads )
+    endif()
+    if( ${_blis_idx_compile_output} MATCHES "omp_" )
+      find_dependency( OpenMP )
+      list( APPEND BLIS_LIBRARIES OpenMP::OpenMP_C )
+    endif()
+  endif()
+
+  try_run( BLIS_USES_LP64
+           BLIS_TEST_COMPILES
+           ${CMAKE_CURRENT_BINARY_DIR}
+    SOURCES ${CMAKE_CURRENT_LIST_DIR}/util/blis_int_size.c
+    CMAKE_FLAGS -DINCLUDE_DIRECTORIES:STRING=${BLIS_INCLUDE_DIR}
+    LINK_LIBRARIES ${BLIS_LIBRARIES}
+    COMPILE_OUTPUT_VARIABLE _blis_idx_compile_output
+    RUN_OUTPUT_VARIABLE     _blis_idx_run_output
+  )
+
 
   if( ${BLIS_USES_LP64} EQUAL 0 )
     set( BLIS_USES_LP64 TRUE )

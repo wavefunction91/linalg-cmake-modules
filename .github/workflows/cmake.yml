@@ -1,0 +1,240 @@
+name: CMake
+
+on: [pull_request]
+
+
+jobs:
+  linux-check-all-libs:
+    runs-on: ubuntu-18.04
+    strategy:
+      matrix:
+        linalg_lib: [blis,openblas,netlib,intel-mkl]
+        mpi_dist: [mpich,openmpi]
+        int_interface: [lp64,ilp64]
+        thread: [sequential,openmp,pthreads,tbb]
+        exclude:
+          - linalg_lib: netlib
+            int_interface: ilp64
+          - linalg_lib: netlib
+            thread: pthreads
+          - linalg_lib: netlib
+            thread: openmp
+          - linalg_lib: intel-mkl
+            thread: pthreads
+          - linalg_lib: netlib
+            mpi_dist: openmpi
+          - linalg_lib: blis
+            mpi_dist: openmpi
+          - linalg_lib: openblas
+            mpi_dist: openmpi
+          - linalg_lib: blis
+            thread: tbb
+          - linalg_lib: openblas
+            thread: tbb
+          - linalg_lib: netlib
+            thread: tbb
+    env:
+      MKLROOT: /opt/intel/mkl
+      CMAKE_PREFIX_PATH: '/home/software/install/${{matrix.linalg_lib}}-${{matrix.int_interface}}-${{matrix.thread}};/home/software/install/netlib-lp64-sequential'
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Ubuntu Setup
+      run: |
+           sudo apt-get -yq update && sudo apt-get install make wget curl libomp5
+           sudo make -C .github/workflows/linalg install/main
+           sudo make -C .github/workflows/linalg install/cmake
+           sudo apt-get clean
+           sudo make -C .github/workflows/linalg apt-add-repository/intel-mkl
+
+    - name: Setup MPI
+      run: |
+           sudo make -C .github/workflows/linalg install/${{matrix.mpi_dist}}
+           which mpicc
+
+    - name: Setup TBB
+      if: ${{matrix.thread == 'tbb'}}
+      run: |
+           sudo apt-get install libtbb-dev
+
+
+    - name: Build Linalg
+      env:
+        BUILD_TARGET: ${{matrix.linalg_lib}}/${{matrix.int_interface}}-${{matrix.thread}} 
+      run: |
+           sudo make -C .github/workflows/linalg download/${{matrix.linalg_lib}} 
+           sudo make -C .github/workflows/linalg install/${BUILD_TARGET}
+
+    - name: Add-On NETLIB
+      # Disable for 
+      #   - MKL b/c MKL already has a LAPACK/ScaLAPACK linker
+      #   - NETLIB b/c the NETLIB is already the used linear algebra lib (no need to add on)
+      #   - ILP64 b/c NETLIB isn't reliable for ILP64 yet
+      if: ${{ matrix.linalg_lib != 'intel-mkl' && matrix.linalg_lib != 'netlib' && matrix.int_interface == 'lp64' }} 
+      run: |
+           sudo make -C .github/workflows/linalg download/netlib
+           sudo make -C .github/workflows/linalg install/netlib/lp64-sequential
+
+
+
+    - name: FindBLAS Default
+      # Disable for MKL-ILP64 b/c the default is LP64 unless otherwise specified
+      if: ${{ matrix.linalg_lib != 'intel-mkl' || matrix.int_interface != 'ilp64' }}
+      run: |
+           cmake -H${GITHUB_WORKSPACE}/examples/blas/default \
+                 -B${{runner.workspace}}/build-findblas-default \
+                 -DCMAKE_MODULE_PATH=${GITHUB_WORKSPACE} \
+                 -DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH} \
+                 -DBLAS_THREAD_LAYER=${{matrix.thread}}
+           .github/workflows/scripts/check_blas_cmake_cache.sh \
+                 ${{runner.workspace}}/build-findblas-default \
+                 ${{matrix.linalg_lib}} ${{matrix.thread}} ${{matrix.int_interface}}
+
+    - name: FindBLAS Integer Specific
+      run: |
+           cmake -H${GITHUB_WORKSPACE}/examples/blas/${{matrix.int_interface}} \
+                 -B${{runner.workspace}}/build-findblas-${{matrix.int_interface}} \
+                 -DCMAKE_MODULE_PATH=${GITHUB_WORKSPACE} \
+                 -DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH} \
+                 -DBLAS_THREAD_LAYER=${{matrix.thread}}
+           .github/workflows/scripts/check_blas_cmake_cache.sh \
+                 ${{runner.workspace}}/build-findblas-${{matrix.int_interface}} \
+                 ${{matrix.linalg_lib}} ${{matrix.thread}} ${{matrix.int_interface}}
+
+    - name: FindBLAS Static Linkage
+      run: |
+           cmake -H${GITHUB_WORKSPACE}/examples/blas/${{matrix.int_interface}} \
+                 -B${{runner.workspace}}/build-findblas-static \
+                 -DCMAKE_MODULE_PATH=${GITHUB_WORKSPACE} \
+                 -DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH} \
+                 -DBLAS_THREAD_LAYER=${{matrix.thread}} \
+                 -DBLAS_PREFERS_STATIC=ON
+           .github/workflows/scripts/check_blas_cmake_cache.sh \
+                 ${{runner.workspace}}/build-findblas-static \
+                 ${{matrix.linalg_lib}} ${{matrix.thread}} ${{matrix.int_interface}}
+
+    - name: FindBLAS Static Linkage (Error Output)
+      if: ${{ failure() }}
+      run: |
+           echo "CMAKE OUTPUT" && cat ${{runner.workspace}}/build-findblas-static/CMakeFiles/CMakeOutput.log
+           echo "CMAKE ERROR"  && cat ${{runner.workspace}}/build-findblas-static/CMakeFiles/CMakeError.log
+
+
+    - name: FindLAPACK Default
+      # Disable for
+      #   - BLIS-ILP64 b/c BLIS doesn't have a LAPACK linker and NETLIB is not tested for ILP64
+      #   - MKL-ILP64 b/c the default is LP64 unless otherwise specified
+      if: ${{ (matrix.linalg_lib != 'blis' && matrix.linalg_lib != 'intel-mkl') || matrix.int_interface != 'ilp64' }}
+      run: |
+           cmake -H${GITHUB_WORKSPACE}/examples/lapack/default \
+                 -B${{runner.workspace}}/build-findlapack-default \
+                 -DCMAKE_MODULE_PATH=${GITHUB_WORKSPACE} \
+                 -DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH} \
+                 -DLAPACK_THREAD_LAYER=${{matrix.thread}}
+           .github/workflows/scripts/check_lapack_cmake_cache.sh \
+                 ${{runner.workspace}}/build-findlapack-default \
+                 ${{matrix.linalg_lib}} ${{matrix.thread}} ${{matrix.int_interface}}
+
+    - name: FindLAPACK Integer Specific
+      # Disable for BLIS-ILP64 b/c BLIS doesn't have a LAPACK linker and NETLIB is not tested for ILP64
+      if: ${{ matrix.linalg_lib != 'blis' || matrix.int_interface != 'ilp64' }}
+      run: |
+           cmake -H${GITHUB_WORKSPACE}/examples/lapack/${{matrix.int_interface}} \
+                 -B${{runner.workspace}}/build-findlapack-${{matrix.int_interface}} \
+                 -DCMAKE_MODULE_PATH=${GITHUB_WORKSPACE} \
+                 -DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH} \
+                 -DLAPACK_THREAD_LAYER=${{matrix.thread}}
+           .github/workflows/scripts/check_lapack_cmake_cache.sh \
+                 ${{runner.workspace}}/build-findlapack-${{matrix.int_interface}} \
+                 ${{matrix.linalg_lib}} ${{matrix.thread}} ${{matrix.int_interface}}
+
+    - name: FindLAPACK Static Linkage
+      if: ${{ matrix.linalg_lib != 'blis' || matrix.int_interface != 'ilp64' }}
+      run: |
+           cmake -H${GITHUB_WORKSPACE}/examples/lapack/${{matrix.int_interface}} \
+                 -B${{runner.workspace}}/build-findlapack-static \
+                 -DCMAKE_MODULE_PATH=${GITHUB_WORKSPACE} \
+                 -DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH} \
+                 -DLAPACK_THREAD_LAYER=${{matrix.thread}} \
+                 -DLAPACK_PREFERS_STATIC=ON
+           .github/workflows/scripts/check_lapack_cmake_cache.sh \
+                 ${{runner.workspace}}/build-findlapack-static \
+                 ${{matrix.linalg_lib}} ${{matrix.thread}} ${{matrix.int_interface}}
+
+
+    - name: FindScaLAPACK Default
+      # Disable for
+      #   - Non-MKL-ILP64 b/c NETLIB can't handle ILP64 consist
+      #   - MKL-ILP64 b/c the default is LP64 unless otherwise specified
+      if: ${{ (matrix.linalg_lib == 'intel-mkl' && matrix.int_interface == 'lp64')  || matrix.int_interface == 'lp64' }}
+      run: |
+           cmake -H${GITHUB_WORKSPACE}/examples/scalapack/default \
+                 -B${{runner.workspace}}/build-findscalapack-default \
+                 -DCMAKE_MODULE_PATH=${GITHUB_WORKSPACE} \
+                 -DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH} \
+                 -DBLAS_THREAD_LAYER=${{matrix.thread}}
+           .github/workflows/scripts/check_scalapack_cmake_cache.sh \
+                 ${{runner.workspace}}/build-findscalapack-default \
+                 ${{matrix.linalg_lib}} ${{matrix.thread}} ${{matrix.int_interface}} ${{matrix.mpi_dist}}
+      
+    - name: FindScaLAPACK Integer Specific
+      # Disable for
+      #   - Non-MKL-ILP64 b/c NETLIB can't handle ILP64 consist
+      if: ${{ matrix.linalg_lib == 'intel-mkl' || matrix.int_interface == 'lp64' }}
+      run: |
+           cmake -H${GITHUB_WORKSPACE}/examples/scalapack/${{matrix.int_interface}} \
+                 -B${{runner.workspace}}/build-findscalapack-${{matrix.int_interface}} \
+                 -DCMAKE_MODULE_PATH=${GITHUB_WORKSPACE} \
+                 -DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH} \
+                 -DBLAS_THREAD_LAYER=${{matrix.thread}}
+           .github/workflows/scripts/check_scalapack_cmake_cache.sh \
+                 ${{runner.workspace}}/build-findscalapack-${{matrix.int_interface}} \
+                 ${{matrix.linalg_lib}} ${{matrix.thread}} ${{matrix.int_interface}} ${{matrix.mpi_dist}}
+
+  check-kitware-compatability:
+    runs-on: ubuntu-18.04
+    env:
+      MKLROOT: /opt/intel/mkl
+      CMAKE_PREFIX_PATH: '/home/software/install/blis-lp64-sequential;/home/software/install/netlib-lp64-sequential'
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Ubuntu Setup
+      run: |
+           sudo apt-get -yq update && sudo apt-get install make wget curl libomp5
+           sudo make -C .github/workflows/linalg install/main
+           sudo make -C .github/workflows/linalg install/cmake
+           sudo apt-get clean
+           sudo make -C .github/workflows/linalg apt-add-repository/intel-mkl
+
+    - name: Build Linalg
+      run: |
+           sudo make -C .github/workflows/linalg download/intel-mkl
+           sudo make -C .github/workflows/linalg install/intel-mkl
+           sudo make -C .github/workflows/linalg download/blis
+           sudo make -C .github/workflows/linalg install/blis/lp64-sequential
+    
+    - name: Check BLA_STATIC
+      run: |
+           cmake -H${GITHUB_WORKSPACE}/examples/blas/lp64 \
+                 -B${{runner.workspace}}/check-bla-static \
+                 -DCMAKE_MODULE_PATH=${GITHUB_WORKSPACE}  \
+                 -DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH} \
+                 -DBLAS_THREAD_LAYER=sequential \
+                 -DBLA_STATIC=ON
+           .github/workflows/scripts/check_blas_cmake_cache.sh \
+                 ${{runner.workspace}}/check-bla-static \
+                 intel-mkl sequential lp64
+
+    - name: Check BLA_VENDOR
+      run: |
+           cmake -H${GITHUB_WORKSPACE}/examples/blas/lp64 \
+                 -B${{runner.workspace}}/check-bla-vendor \
+                 -DCMAKE_MODULE_PATH=${GITHUB_WORKSPACE}  \
+                 -DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH} \
+                 -DBLAS_THREAD_LAYER=sequential \
+                 -DBLA_VENDOR="BLIS"
+           .github/workflows/scripts/check_blas_cmake_cache.sh \
+                 ${{runner.workspace}}/check-bla-vendor \
+                 blis sequential lp64

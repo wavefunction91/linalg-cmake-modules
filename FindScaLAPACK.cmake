@@ -9,10 +9,7 @@
 #
 #   This module will export the following targets if SCALAPACK_FOUND
 #
-#     ScaLAPACK::scalapack
-#
-#
-#
+#     ScaLAPACK::ScaLAPACK
 #
 #   Proper usage:
 #
@@ -21,73 +18,33 @@
 #
 #     if( ScaLAPACK_FOUND )
 #       add_executable( test test.cxx )
-#       target_link_libraries( test ScaLAPACK::scalapack )
+#       target_link_libraries( test ScaLAPACK::ScaLAPACK )
 #     endif()
-#
-#
 #
 #
 #   This module will use the following variables to change
 #   default behaviour if set
 #
-#     scalapack_PREFIX
-#     scalapack_LIBRARY_DIR
-#     scalapack_LIBRARIES
-#
-#==================================================================
-#   Copyright (c) 2018 The Regents of the University of California,
-#   through Lawrence Berkeley National Laboratory.  
-#
-#   Author: David Williams-Young
-#   
-#   This file is part of cmake-modules. All rights reserved.
-#   
-#   Redistribution and use in source and binary forms, with or without
-#   modification, are permitted provided that the following conditions are met:
-#   
-#   (1) Redistributions of source code must retain the above copyright notice, this
-#   list of conditions and the following disclaimer.
-#   (2) Redistributions in binary form must reproduce the above copyright notice,
-#   this list of conditions and the following disclaimer in the documentation
-#   and/or other materials provided with the distribution.
-#   (3) Neither the name of the University of California, Lawrence Berkeley
-#   National Laboratory, U.S. Dept. of Energy nor the names of its contributors may
-#   be used to endorse or promote products derived from this software without
-#   specific prior written permission.
-#   
-#   THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
-#   ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-#   WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-#   DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR
-#   ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-#   (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-#   LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
-#   ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-#   (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-#   SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-#   
-#   You are under no obligation whatsoever to provide any bug fixes, patches, or
-#   upgrades to the features, functionality or performance of the source code
-#   ("Enhancements") to anyone; however, if you choose to make your Enhancements
-#   available either publicly, or directly to Lawrence Berkeley National
-#   Laboratory, without imposing a separate written license agreement for such
-#   Enhancements, then you hereby grant the following license: a non-exclusive,
-#   royalty-free perpetual license to install, use, modify, prepare derivative
-#   works, incorporate into other computer software, distribute, and sublicense
-#   such enhancements or derivative works thereof, in binary and source code form.
-#
-#==================================================================
+#     ScaLAPACK_PREFIX
+#     ScaLAPACK_LIBRARY_DIR
+#     ScaLAPACK_LIBRARIES
 
-cmake_minimum_required( VERSION 3.11 ) # Require CMake 3.11+
+cmake_minimum_required( VERSION 3.17 ) # Require CMake 3.17+
 
+include( CMakePushCheckState )
+include( CheckLibraryExists )
+include( CheckSymbolExists )
+include( FindPackageHandleStandardArgs )
 include( CMakeFindDependencyMacro )
 
-include( ${CMAKE_CURRENT_LIST_DIR}/util/CommonFunctions.cmake )
+include( ${CMAKE_CURRENT_LIST_DIR}/util/CommonFunctions.cmake    )
 include( ${CMAKE_CURRENT_LIST_DIR}/util/ScaLAPACKUtilities.cmake )
+include( ${CMAKE_CURRENT_LIST_DIR}/LinAlgModulesMacros.cmake     )
+
 
 # SANITY CHECK
 if( "ilp64" IN_LIST ScaLAPACK_FIND_COMPONENTS AND "lp64" IN_LIST ScaLAPACK_FIND_COMPONENTS )
-  message( FATAL_ERROR "ScaLAPACK cannot link to both ILP64 and LP64 iterfaces" )
+  message( FATAL_ERROR "ScaLAPACK cannot link to both ILP64 and LP64 interfaces" )
 endif()
 
 
@@ -100,6 +57,7 @@ foreach( _comp ${ScaLAPACK_FIND_COMPONENTS} )
   endif()
 endforeach()
 
+emulate_kitware_linalg_modules( ScaLAPACK )
 fill_out_prefix( ScaLAPACK )
 
 if( NOT ScaLAPACK_PREFERENCE_LIST )
@@ -111,6 +69,7 @@ if( NOT ScaLAPACK_LIBRARIES )
 
   # Find LAPACK
   if( NOT TARGET LAPACK::LAPACK )
+    copy_meta_data( ScaLAPACK LAPACK )
     find_dependency( LAPACK 
       COMPONENTS          ${ScaLAPACK_REQUIRED_COMPONENTS}
       OPTIONAL_COMPONENTS ${ScaLAPACK_OPTIONAL_COMPONENTS} scalapack blacs 
@@ -123,7 +82,7 @@ if( NOT ScaLAPACK_LIBRARIES )
   set( ScaLAPACK_INCLUDE_DIR         ${LAPACK_INCLUDE_DIR}         )
   set( ScaLAPACK_COMPILE_DEFINITIONS ${LAPACK_COMPILE_DEFINITIONS} )
   check_pdpotrf_exists( ScaLAPACK_LIBRARIES 
-    LAPACK_HAS_ScaLAPACK ScaLAPACK_FORTRAN_LOWER ScaLAPACK_FORTRAN_UNDERSCORE
+    LAPACK_HAS_ScaLAPACK ScaLAPACK_Fortran_LOWER ScaLAPACK_Fortran_UNDERSCORE
   )
 
   # If LAPACK has a full ScaLAPACK Linker, propagate vars
@@ -168,6 +127,9 @@ if( NOT ScaLAPACK_LIBRARIES )
 
     endforeach()
   endif( LAPACK_HAS_ScaLAPACK )
+
+  else()
+    find_linalg_dependencies( ScaLAPACK_LIBRARIES )
 endif()
 
 # Handle implicit LAPACK linkage
@@ -181,7 +143,7 @@ if( LAPACK_HAS_ScaLAPACK )
   set( ScaLAPACK_LINK_OK TRUE )
 else()
   check_pdpotrf_exists( ScaLAPACK_LIBRARIES 
-    ScaLAPACK_LINK_OK ScaLAPACK_FORTRAN_LOWER ScaLAPACK_FORTRAN_UNDERSCORE
+    ScaLAPACK_LINK_OK ScaLAPACK_Fortran_LOWER ScaLAPACK_Fortran_UNDERSCORE
   )
 endif()
 
@@ -190,10 +152,10 @@ if( ScaLAPACK_LINK_OK )
 
   # TODO: This requires running an MPI program, pretty dangerous
   #set( _pdpotrf_name "pdpotrf" )
-  #if( NOT ScaLAPACK_FORTRAN_LOWER )
+  #if( NOT ScaLAPACK_Fortran_LOWER )
   #  string( TOUPPER "${_pdpotrf_name}" _pdpotrf_name )
   #endif()
-  #if( ScaLAPACK_FORTRAN_UNDERSCORE )
+  #if( ScaLAPACK_Fortran_UNDERSCORE )
   #  set( _pdpotrf_name "${_pdpotrf_name}_" )
   #endif()
 
@@ -210,6 +172,13 @@ if( ScaLAPACK_LINK_OK )
   else()
     set( ScaLAPACK_lp64_FOUND  FALSE )
     set( ScaLAPACK_ilp64_FOUND TRUE  )
+    find_dependency( ILP64 )
+    list( APPEND ScaLAPACK_COMPILE_OPTIONS "${ILP64_COMPILE_OPTIONS}" )
+    foreach ( lang C CXX Fortran )
+        if ( DEFINED ILP64_${lang}_COMPILE_OPTIONS )
+            list( APPEND ScaLAPACK_${lang}_COMPILE_OPTIONS "${ILP64_${lang}_COMPILE_OPTIONS}" )
+        endif()
+    endforeach()
   endif()
 
 else()
@@ -220,13 +189,14 @@ else()
 
 endif()
 
-
-
-
 find_package_handle_standard_args( ScaLAPACK
   REQUIRED_VARS ScaLAPACK_LINK_OK
   HANDLE_COMPONENTS
 )
+
+# Cache variables
+set( ScaLAPACK_IS_LP64   "${ScaLAPACK_IS_LP64}"   CACHE STRING "ScaLAPACK LP64 Flag" FORCE )
+set( ScaLAPACK_LIBRARIES "${ScaLAPACK_LIBRARIES}" CACHE STRING "ScaLAPACK Libraries" FORCE )
 
 if( ScaLAPACK_FOUND AND NOT TARGET ScaLAPACK::ScaLAPACK )
   
