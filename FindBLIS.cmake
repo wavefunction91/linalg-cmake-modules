@@ -18,7 +18,7 @@ find_library( BLIS_LIBRARIES
 )
 
 find_path( BLIS_INCLUDE_DIR
-  NAMES blis/blis.h
+  NAMES blis.h blis/blis.h
   HINTS ${BLIS_PREFIX}
   PATHS ${BLIS_INCLUDE_DIR}
   PATH_SUFFIXES include
