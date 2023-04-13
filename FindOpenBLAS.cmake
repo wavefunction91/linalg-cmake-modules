@@ -18,18 +18,18 @@ find_library( OpenBLAS_LIBRARIES
 )
 
 find_path( OpenBLAS_INCLUDE_DIR
-  NAMES openblas_config.h
+  NAMES openblas/openblas_config.h openblas_config.h
   HINTS ${OpenBLAS_PREFIX}
   PATHS ${OpenBLAS_INCLUDE_DIR}
   PATH_SUFFIXES include
   DOC "OpenBLAS header"
 )
   
-#if( OpenBLAS_LIBRARY AND OpenBLAS_PREFERS_STATIC )
-#  include( CMakeFindDependency )
-#  find_package( Threads QUIET )
-#  set( OpenBLAS_LIBRARIES ${OpenBLAS_LIBRARY} Threads::Threads "m")
-#endif()
+if( OpenBLAS_LIBRARY AND OpenBLAS_PREFERS_STATIC )
+  include( CMakeFindDependency )
+  find_package( Threads QUIET )
+  set( OpenBLAS_LIBRARIES ${OpenBLAS_LIBRARY} Threads::Threads "m")
+endif()
 
 # check ILP64
 if( OpenBLAS_INCLUDE_DIR )
@@ -42,6 +42,8 @@ if( OpenBLAS_INCLUDE_DIR )
     COMPILE_OUTPUT_VARIABLE _openblas_idx_compile_output
     RUN_OUTPUT_VARIABLE     _openblas_idx_run_output
   )
+  message( STATUS ${_openblas_idx_compile_output} )
+  message( STATUS ${_openblas_idx_run_output} )
 
   if( ${OpenBLAS_USES_LP64} EQUAL 0 )
     set( OpenBLAS_USES_LP64 TRUE )
@@ -67,12 +69,12 @@ find_package_handle_standard_args( OpenBLAS
   HANDLE_COMPONENTS
 )
 
-#if( OpenBLAS_FOUND AND NOT TARGET OpenBLAS::OpenBLAS )
-#
-#  add_library( OpenBLAS::OpenBLAS INTERFACE IMPORTED )
-#  set_target_properties( OpenBLAS::OpenBLAS PROPERTIES
-#    INTERFACE_INCLUDE_DIRECTORIES "${OpenBLAS_INCLUDE_DIR}"
-#    INTERFACE_LINK_LIBRARIES      "${OpenBLAS_LIBRARIES}"
-#  )
-#
-#endif()
+if( OpenBLAS_FOUND AND NOT TARGET OpenBLAS::OpenBLAS )
+
+  add_library( OpenBLAS::OpenBLAS INTERFACE IMPORTED )
+  set_target_properties( OpenBLAS::OpenBLAS PROPERTIES
+    INTERFACE_INCLUDE_DIRECTORIES "${OpenBLAS_INCLUDE_DIR}"
+    INTERFACE_LINK_LIBRARIES      "${OpenBLAS_LIBRARIES}"
+  )
+
+endif()
