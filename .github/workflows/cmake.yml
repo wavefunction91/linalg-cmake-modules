@@ -35,6 +35,7 @@ jobs:
             thread: tbb
     env:
       MKLROOT: /opt/intel/mkl
+      TBBROOT: /opt/intel/mkl
       CMAKE_PREFIX_PATH: '/home/software/install/${{matrix.linalg_lib}}-${{matrix.int_interface}}-${{matrix.thread}};/home/software/install/netlib-lp64-sequential'
 
     steps:
@@ -53,10 +54,10 @@ jobs:
            sudo make -C .github/workflows/linalg install/${{matrix.mpi_dist}}
            which mpicc
 
-    - name: Setup TBB
-      if: ${{matrix.thread == 'tbb'}}
-      run: |
-           sudo apt-get install libtbb-dev
+    #- name: Setup TBB
+    #  if: ${{matrix.thread == 'tbb'}}
+    #  run: |
+    #       sudo apt-get install libtbb-dev
 
 
     - name: Build Linalg
