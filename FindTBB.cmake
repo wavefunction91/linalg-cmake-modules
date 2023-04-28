@@ -448,7 +448,7 @@ findpkg_finish(TBB_MALLOC_PROXY tbbmalloc_proxy)
 
 #=============================================================================
 #parse all the version numbers from tbb
-if(NOT TBB_VERSION)
+if(NOT TBB_IGNORE_HEADERS AND NOT TBB_VERSION)
   if (EXISTS "${TBB_INCLUDE_DIR}/oneapi/tbb/version.h")
     file(STRINGS
             "${TBB_INCLUDE_DIR}/oneapi/tbb/version.h"
