@@ -113,7 +113,7 @@ jobs:
     - name: FindBLAS Integer Specific (Error Output)
       if: ${{ failure() }}
       run: |
-           echo "CMAKE OUTPUT" && cat ${{runner.workspace}}/build-findblas-${{matrix.int_interface}}/CMakeFiles/CMakeOutput.log
+           #echo "CMAKE OUTPUT" && cat ${{runner.workspace}}/build-findblas-${{matrix.int_interface}}/CMakeFiles/CMakeOutput.log
            echo "CMAKE ERROR"  && cat ${{runner.workspace}}/build-findblas-${{matrix.int_interface}}/CMakeFiles/CMakeError.log
 
     - name: FindBLAS Static Linkage
@@ -131,7 +131,7 @@ jobs:
     - name: FindBLAS Static Linkage (Error Output)
       if: ${{ failure() }}
       run: |
-           echo "CMAKE OUTPUT" && cat ${{runner.workspace}}/build*/CMakeFiles/CMakeOutput.log
+           #echo "CMAKE OUTPUT" && cat ${{runner.workspace}}/build*/CMakeFiles/CMakeOutput.log
            echo "CMAKE ERROR"  && cat ${{runner.workspace}}/build*/CMakeFiles/CMakeError.log
 
 
