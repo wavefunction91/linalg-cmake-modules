@@ -102,6 +102,12 @@ jobs:
                  ${{runner.workspace}}/build-findblas-${{matrix.int_interface}} \
                  ${{matrix.linalg_lib}} ${{matrix.thread}} ${{matrix.int_interface}}
 
+    - name: FindBLAS Integer Specific (Error Output)
+      if: ${{ failure() }}
+      run: |
+           echo "CMAKE OUTPUT" && cat ${{runner.workspace}}/build-findblas-${{matrix.int_interface}}/CMakeFiles/CMakeOutput.log
+           echo "CMAKE ERROR"  && cat ${{runner.workspace}}/build-findblas-${{matrix.int_interface}}/CMakeFiles/CMakeError.log
+
     - name: FindBLAS Static Linkage
       run: |
            cmake -H${GITHUB_WORKSPACE}/examples/blas/${{matrix.int_interface}} \
