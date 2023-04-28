@@ -193,7 +193,7 @@ jobs:
                  ${{matrix.linalg_lib}} ${{matrix.thread}} ${{matrix.int_interface}} ${{matrix.mpi_dist}}
 
   check-kitware-compatability:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-22.04
     env:
       MKLROOT: /opt/intel/mkl
       CMAKE_PREFIX_PATH: '/home/software/install/blis-lp64-sequential;/home/software/install/netlib-lp64-sequential'
