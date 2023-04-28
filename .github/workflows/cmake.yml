@@ -214,7 +214,7 @@ jobs:
       MKLROOT: /opt/intel/mkl
       CMAKE_PREFIX_PATH: '/home/software/install/blis-lp64-sequential;/home/software/install/netlib-lp64-sequential'
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
 
     - name: Ubuntu Setup
       run: |
