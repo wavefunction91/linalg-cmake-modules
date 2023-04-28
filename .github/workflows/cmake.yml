@@ -117,6 +117,8 @@ jobs:
     - name: FindBLAS Static Linkage (Error Output)
       if: ${{ failure() }}
       run: |
+           ls ${{runner.workspace}}/build-findblas-static
+           ls ${{runner.workspace}}/build-findblas-static/CMakeFiles
            echo "CMAKE OUTPUT" && cat ${{runner.workspace}}/build-findblas-static/CMakeFiles/CMakeOutput.log
            echo "CMAKE ERROR"  && cat ${{runner.workspace}}/build-findblas-static/CMakeFiles/CMakeError.log
 
