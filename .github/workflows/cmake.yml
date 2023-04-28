@@ -35,7 +35,8 @@ jobs:
             thread: tbb
     env:
       MKLROOT: /opt/intel/mkl
-      TBBROOT: /opt/intel/mkl
+      TBBROOT: /opt/intel/compilers_and_libraries_2020.4.304/linux/tbb 
+      TBB_IGNORE_HEADERS: TRUE
       CMAKE_PREFIX_PATH: '/home/software/install/${{matrix.linalg_lib}}-${{matrix.int_interface}}-${{matrix.thread}};/home/software/install/netlib-lp64-sequential'
 
     steps:
