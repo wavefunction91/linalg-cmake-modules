@@ -5,7 +5,7 @@ on: [pull_request]
 
 jobs:
   linux-check-all-libs:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-22.04
     strategy:
       matrix:
         linalg_lib: [blis,openblas,netlib,intel-mkl]
@@ -35,10 +35,12 @@ jobs:
             thread: tbb
     env:
       MKLROOT: /opt/intel/mkl
+      TBBROOT: /opt/intel/compilers_and_libraries_2020.4.304/linux/tbb 
+      TBB_IGNORE_HEADERS: TRUE
       CMAKE_PREFIX_PATH: '/home/software/install/${{matrix.linalg_lib}}-${{matrix.int_interface}}-${{matrix.thread}};/home/software/install/netlib-lp64-sequential'
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
 
     - name: Ubuntu Setup
       run: |
@@ -53,10 +55,10 @@ jobs:
            sudo make -C .github/workflows/linalg install/${{matrix.mpi_dist}}
            which mpicc
 
-    - name: Setup TBB
-      if: ${{matrix.thread == 'tbb'}}
-      run: |
-           sudo apt-get install libtbb-dev
+    #- name: Setup TBB
+    #  if: ${{matrix.thread == 'tbb'}}
+    #  run: |
+    #       sudo apt-get install libtbb-dev
 
 
     - name: Build Linalg
@@ -91,6 +93,14 @@ jobs:
                  ${{runner.workspace}}/build-findblas-default \
                  ${{matrix.linalg_lib}} ${{matrix.thread}} ${{matrix.int_interface}}
 
+    - name: FindBLAS Default (Error Output)
+      if: ${{ failure() }}
+      run: |
+           ls ${{runner.workspace}}/build-findblas-default
+           ls ${{runner.workspace}}/build-findblas-default/CMakeFiles
+           #echo "CMAKE OUTPUT" && cat ${{runner.workspace}}/build-findblas-default/CMakeFiles/CMakeOutput.log
+           echo "CMAKE ERROR"  && cat ${{runner.workspace}}/build-findblas-default/CMakeFiles/CMakeError.log
+
     - name: FindBLAS Integer Specific
       run: |
            cmake -H${GITHUB_WORKSPACE}/examples/blas/${{matrix.int_interface}} \
@@ -101,6 +111,12 @@ jobs:
            .github/workflows/scripts/check_blas_cmake_cache.sh \
                  ${{runner.workspace}}/build-findblas-${{matrix.int_interface}} \
                  ${{matrix.linalg_lib}} ${{matrix.thread}} ${{matrix.int_interface}}
+
+    - name: FindBLAS Integer Specific (Error Output)
+      if: ${{ failure() }}
+      run: |
+           #echo "CMAKE OUTPUT" && cat ${{runner.workspace}}/build-findblas-${{matrix.int_interface}}/CMakeFiles/CMakeOutput.log
+           echo "CMAKE ERROR"  && cat ${{runner.workspace}}/build-findblas-${{matrix.int_interface}}/CMakeFiles/CMakeError.log
 
     - name: FindBLAS Static Linkage
       run: |
@@ -117,8 +133,8 @@ jobs:
     - name: FindBLAS Static Linkage (Error Output)
       if: ${{ failure() }}
       run: |
-           echo "CMAKE OUTPUT" && cat ${{runner.workspace}}/build-findblas-static/CMakeFiles/CMakeOutput.log
-           echo "CMAKE ERROR"  && cat ${{runner.workspace}}/build-findblas-static/CMakeFiles/CMakeError.log
+           #echo "CMAKE OUTPUT" && cat ${{runner.workspace}}/build*/CMakeFiles/CMakeOutput.log
+           echo "CMAKE ERROR"  && cat ${{runner.workspace}}/build*/CMakeFiles/CMakeError.log
 
 
     - name: FindLAPACK Default
@@ -193,12 +209,12 @@ jobs:
                  ${{matrix.linalg_lib}} ${{matrix.thread}} ${{matrix.int_interface}} ${{matrix.mpi_dist}}
 
   check-kitware-compatability:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-22.04
     env:
       MKLROOT: /opt/intel/mkl
       CMAKE_PREFIX_PATH: '/home/software/install/blis-lp64-sequential;/home/software/install/netlib-lp64-sequential'
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
 
     - name: Ubuntu Setup
       run: |
