@@ -91,6 +91,14 @@ jobs:
                  ${{runner.workspace}}/build-findblas-default \
                  ${{matrix.linalg_lib}} ${{matrix.thread}} ${{matrix.int_interface}}
 
+    - name: FindBLAS Default (Error Output)
+      if: ${{ failure() }}
+      run: |
+           ls ${{runner.workspace}}/build-findblas-default
+           ls ${{runner.workspace}}/build-findblas-default/CMakeFiles
+           echo "CMAKE OUTPUT" && cat ${{runner.workspace}}/build-findblas-default/CMakeFiles/CMakeOutput.log
+           echo "CMAKE ERROR"  && cat ${{runner.workspace}}/build-findblas-default/CMakeFiles/CMakeError.log
+
     - name: FindBLAS Integer Specific
       run: |
            cmake -H${GITHUB_WORKSPACE}/examples/blas/${{matrix.int_interface}} \
@@ -105,8 +113,6 @@ jobs:
     - name: FindBLAS Integer Specific (Error Output)
       if: ${{ failure() }}
       run: |
-           ls ${{runner.workspace}}/build-findblas-${{matrix.int_interface}}
-           ls ${{runner.workspace}}/build-findblas-${{matrix.int_interface}}/CMakeFiles
            echo "CMAKE OUTPUT" && cat ${{runner.workspace}}/build-findblas-${{matrix.int_interface}}/CMakeFiles/CMakeOutput.log
            echo "CMAKE ERROR"  && cat ${{runner.workspace}}/build-findblas-${{matrix.int_interface}}/CMakeFiles/CMakeError.log
 
