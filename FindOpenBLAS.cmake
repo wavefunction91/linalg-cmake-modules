@@ -21,7 +21,7 @@ find_path( OpenBLAS_INCLUDE_DIR
   NAMES openblas_config.h
   HINTS ${OpenBLAS_PREFIX}
   PATHS ${OpenBLAS_INCLUDE_DIR}
-  PATH_SUFFIXES include
+  PATH_SUFFIXES include include/openblas
   DOC "OpenBLAS header"
 )
   
