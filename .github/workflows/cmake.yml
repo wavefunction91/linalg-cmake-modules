@@ -80,26 +80,47 @@ jobs:
 
 
 
-    - name: FindBLAS Default
+    - name: FindBLAS Default (C)
       # Disable for MKL-ILP64 b/c the default is LP64 unless otherwise specified
       if: ${{ matrix.linalg_lib != 'intel-mkl' || matrix.int_interface != 'ilp64' }}
       run: |
-           cmake -H${GITHUB_WORKSPACE}/examples/blas/default \
-                 -B${{runner.workspace}}/build-findblas-default \
+           cmake -H${GITHUB_WORKSPACE}/examples/blas/default_c \
+                 -B${{runner.workspace}}/build-findblas-default_c \
                  -DCMAKE_MODULE_PATH=${GITHUB_WORKSPACE} \
                  -DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH} \
                  -DBLAS_THREAD_LAYER=${{matrix.thread}}
            .github/workflows/scripts/check_blas_cmake_cache.sh \
-                 ${{runner.workspace}}/build-findblas-default \
+                 ${{runner.workspace}}/build-findblas-default_c \
                  ${{matrix.linalg_lib}} ${{matrix.thread}} ${{matrix.int_interface}}
 
-    - name: FindBLAS Default (Error Output)
+    - name: FindBLAS Default (C) (Error Output)
       if: ${{ failure() }}
       run: |
-           ls ${{runner.workspace}}/build-findblas-default
-           ls ${{runner.workspace}}/build-findblas-default/CMakeFiles
-           #echo "CMAKE OUTPUT" && cat ${{runner.workspace}}/build-findblas-default/CMakeFiles/CMakeOutput.log
-           echo "CMAKE ERROR"  && cat ${{runner.workspace}}/build-findblas-default/CMakeFiles/CMakeError.log
+           ls ${{runner.workspace}}/build-findblas-default_c
+           ls ${{runner.workspace}}/build-findblas-default_c/CMakeFiles
+           #echo "CMAKE OUTPUT" && cat ${{runner.workspace}}/build-findblas-default_c/CMakeFiles/CMakeOutput.log
+           echo "CMAKE ERROR"  && cat ${{runner.workspace}}/build-findblas-default_c/CMakeFiles/CMakeError.log
+
+    - name: FindBLAS Default (CXX)
+      # Disable for MKL-ILP64 b/c the default is LP64 unless otherwise specified
+      if: ${{ matrix.linalg_lib != 'intel-mkl' || matrix.int_interface != 'ilp64' }}
+      run: |
+           cmake -H${GITHUB_WORKSPACE}/examples/blas/default_cxx \
+                 -B${{runner.workspace}}/build-findblas-default_cxx \
+                 -DCMAKE_MODULE_PATH=${GITHUB_WORKSPACE} \
+                 -DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH} \
+                 -DBLAS_THREAD_LAYER=${{matrix.thread}}
+           .github/workflows/scripts/check_blas_cmake_cache.sh \
+                 ${{runner.workspace}}/build-findblas-default_cxx \
+                 ${{matrix.linalg_lib}} ${{matrix.thread}} ${{matrix.int_interface}}
+
+    - name: FindBLAS Default (CXX) (Error Output)
+      if: ${{ failure() }}
+      run: |
+           ls ${{runner.workspace}}/build-findblas-default_cxx
+           ls ${{runner.workspace}}/build-findblas-default_cxx/CMakeFiles
+           #echo "CMAKE OUTPUT" && cat ${{runner.workspace}}/build-findblas-default_cxx/CMakeFiles/CMakeOutput.log
+           echo "CMAKE ERROR"  && cat ${{runner.workspace}}/build-findblas-default_cxx/CMakeFiles/CMakeError.log
 
     - name: FindBLAS Integer Specific
       run: |

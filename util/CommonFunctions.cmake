@@ -153,8 +153,19 @@ endfunction()
 
 function( check_function_exists_w_results _libs _func _output _result )
 
+  get_property( _enabled_languages GLOBAL PROPERTY ENABLED_LANGUAGES )
+
+  set(_func_src_file)
+  if( "C" IN_LIST _enabled_langauges )
+    set( _func_src_file ${COMMON_UTILITY_CMAKE_FILE_DIR}/func_check.c )
+  elseif( "CXX" IN_LIST _enabled_langauges )
+    set( _func_src_file ${COMMON_UTILITY_CMAKE_FILE_DIR}/func_check.cxx )
+  elseif( "Fortran" IN_LIST _enabled_langauges )
+    set( _func_src_file ${COMMON_UTILITY_CMAKE_FILE_DIR}/func_check.f )
+  endif()
+
   try_compile( ${_result} ${CMAKE_CURRENT_BINARY_DIR}
-                 SOURCES ${COMMON_UTILITY_CMAKE_FILE_DIR}/func_check.c
+                 SOURCES ${_func_src_file}
                  COMPILE_DEFINITIONS "-DFUNC_NAME=${_func}"
                  LINK_LIBRARIES ${_libs} 
                  OUTPUT_VARIABLE ${_output} )
