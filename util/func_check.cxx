@@ -1,4 +1,4 @@
-void FUNC_NAME();
+extern "C" { void FUNC_NAME(); }
 int main() {
   FUNC_NAME();
   return 0;
