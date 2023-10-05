@@ -16,6 +16,14 @@ if( "ilp64" IN_LIST LAPACK_FIND_COMPONENTS AND "lp64" IN_LIST LAPACK_FIND_COMPON
   message( FATAL_ERROR "LAPACK cannot link to both ILP64 and LP64 interfaces" )
 endif()
 
+# List of functions to check for valid LAPACK - overridable
+if( NOT LAPACK_TEST_FUNCTIONS )
+  # use dpstrf to check for full LAPACK API ... some implementations are incomplete (e.g. older OpenBLAS)
+  # also need to handle several corner cases:
+  # - OpenBLAS needs libgfortran only for some functions, dpstrf is not one of them, so check for dgesvd
+  set( LAPACK_TEST_FUNCTIONS "dpstrf;dgesvd" )
+endif()
+
 
 # Get list of required / optional components
 foreach( _comp ${LAPACK_FIND_COMPONENTS} )
@@ -50,10 +58,8 @@ if( NOT LAPACK_LIBRARIES )
   set( LAPACK_INCLUDE_DIRS        ${BLAS_INCLUDE_DIRS}        )
   set( LAPACK_COMPILE_DEFINITIONS ${BLAS_COMPILE_DEFINITIONS} )
 
-  # use dpstrf to check for full LAPACK API ... some implementations are incomplete (e.g. older OpenBLAS)
-  # also need to handle several corner cases:
-  # - OpenBLAS needs libgfortran only for some functions, dpstrf is not one of them, so check for dgesvd
-  check_fortran_functions_exist( "dpstrf;dgesvd" LAPACK LAPACK_LIBRARIES
+  # Check for required LAPACK functions
+  check_fortran_functions_exist( "${LAPACK_TEST_FUNCTIONS}" LAPACK LAPACK_LIBRARIES
           BLAS_HAS_LAPACK LAPACK_Fortran_LOWER LAPACK_Fortran_UNDERSCORE
           )
 
@@ -123,8 +129,8 @@ endif()
 if( BLAS_HAS_LAPACK )
   set( LAPACK_LINK_OK TRUE )
 else()
-  # see notes above the first invocation of check_fortran_functions_exist
-  check_fortran_functions_exist( "dpstrf;dgesvd" LAPACK LAPACK_LIBRARIES
+  # Check for required LAPACK functions
+  check_fortran_functions_exist( "${LAPACK_TEST_FUNCTIONS}" LAPACK LAPACK_LIBRARIES
           LAPACK_LINK_OK LAPACK_Fortran_LOWER LAPACK_Fortran_UNDERSCORE
           )
 endif()
