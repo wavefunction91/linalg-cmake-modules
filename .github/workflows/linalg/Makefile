@@ -9,9 +9,6 @@ export DEBIAN_FRONTEND=noninteractive
 ubuntu_release = $(shell lsb_release -sr)
 
 
-intel_mkl_version ?= 2020.4-304
-intel_mkl := intel-mkl-\*-${intel_mkl_version}
-
 install/main:
 	apt-get update
 	apt-get -yq install \
@@ -72,18 +69,15 @@ install/openmpi:
 
 # Intel
 apt-add-repository/intel-mkl:
-	wget -O - https://apt.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS-2019.PUB | apt-key add -
-	apt-add-repository "deb https://apt.repos.intel.com/mkl all main"
-	apt-get -yq update
-
-download/intel-mkl:
-	apt-get install -yq --download-only ${intel_mkl}
+	apt install -y build-essential wget make gpg
+	wget -O- https://apt.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB | gpg --dearmor | tee /usr/share/keyrings/oneapi-archive-keyring.gpg > /dev/null
+	echo "deb [signed-by=/usr/share/keyrings/oneapi-archive-keyring.gpg] https://apt.repos.intel.com/oneapi all main" | tee /etc/apt/sources.list.d/oneAPI.list	
+	apt update
 
 install/intel-mkl:
-	apt-get -yq install ${intel_mkl}
-	rm -rf /opt/intel/mkl
-	ln -s /opt/intel/compilers_and_libraries_$(subst -,.,${intel_mkl_version})/linux/mkl /opt/intel/mkl
-	test -x /opt/intel/mkl/bin/mklvars.sh
+	apt -y install intel-oneapi-mkl-core intel-oneapi-mkl-core-devel intel-oneapi-mpi intel-oneapi-mpi-devel intel-oneapi-mkl-cluster intel-oneapi-mkl-cluster-devel
+
+download/intel-mkl: apt-add-repository/intel-mkl
 
 install/intel-mkl/lp64-sequential:  install/intel-mkl
 install/intel-mkl/lp64-openmp:  install/intel-mkl

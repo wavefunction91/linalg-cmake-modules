@@ -34,8 +34,8 @@ jobs:
           - linalg_lib: netlib
             thread: tbb
     env:
-      MKLROOT: /opt/intel/mkl
-      TBBROOT: /opt/intel/compilers_and_libraries_2020.4.304/linux/tbb 
+      MKLROOT: /opt/intel/oneapi/mkl/latest
+      TBBROOT: /opt/intel/oneapi/tbb/latest
       TBB_IGNORE_HEADERS: TRUE
       CMAKE_PREFIX_PATH: '/home/software/install/${{matrix.linalg_lib}}-${{matrix.int_interface}}-${{matrix.thread}};/home/software/install/netlib-lp64-sequential'
 
@@ -211,7 +211,7 @@ jobs:
   check-kitware-compatability:
     runs-on: ubuntu-22.04
     env:
-      MKLROOT: /opt/intel/mkl
+      MKLROOT: /opt/intel/oneapi/mkl/latest
       CMAKE_PREFIX_PATH: '/home/software/install/blis-lp64-sequential;/home/software/install/netlib-lp64-sequential'
     steps:
     - uses: actions/checkout@v3
