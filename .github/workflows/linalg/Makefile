@@ -75,7 +75,7 @@ apt-add-repository/intel-mkl:
 	apt update
 
 install/intel-mkl:
-	apt -y install intel-oneapi-mkl-core intel-oneapi-mkl-core-devel 
+	apt -y install intel-oneapi-mkl-core intel-oneapi-mkl-core-devel intel-oneapi-mpi intel-oneapi-mpi-devel intel-oneapi-mkl-cluster intel-oneapi-mkl-cluster-devel
 
 download/intel-mkl: apt-add-repository/intel-mkl
 
