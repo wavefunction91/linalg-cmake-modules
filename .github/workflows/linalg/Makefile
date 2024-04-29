@@ -77,6 +77,8 @@ apt-add-repository/intel-mkl:
 install/intel-mkl:
 	apt -y install intel-oneapi-mkl-core intel-oneapi-mkl-core-devel 
 
+download/intel-mkl: apt-add-repository/intel-mkl
+
 install/intel-mkl/lp64-sequential:  install/intel-mkl
 install/intel-mkl/lp64-openmp:  install/intel-mkl
 install/intel-mkl/lp64-tbb:     install/intel-mkl
