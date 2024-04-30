@@ -116,34 +116,34 @@ install/blis/ilp64-sequential:
 # OpenBLAS
 download/openblas:
 	mkdir -p ${software_prefix}/src/openblas
-	cd ${software_prefix}/src/openblas && wget https://github.com/OpenMathLib/OpenBLAS/releases/download/v0.3.27/OpenBLAS-0.3.27.tar.gz
-	cd ${software_prefix}/src/openblas && tar xzf OpenBLAS-0.3.27.tar.gz
+	cd ${software_prefix}/src/openblas && wget https://github.com/OpenMathLib/OpenBLAS/releases/download/v0.3.26/OpenBLAS-0.3.26.tar.gz
+	cd ${software_prefix}/src/openblas && tar xzf OpenBLAS-0.3.26.tar.gz
 
 install/openblas/lp64-sequential:
-	make -C ${software_prefix}/src/openblas/OpenBLAS-0.3.27 clean
-	BINARY64=1 USE_THREAD=0 CC=gcc FC=gfortran NO_CBLAS=1 NO_LAPACKE=1 TARGET=GENERIC make -C ${software_prefix}/src/openblas/OpenBLAS-0.3.27
-	make -C ${software_prefix}/src/openblas/OpenBLAS-0.3.27 PREFIX=${software_prefix}/install/openblas-lp64-sequential  install
+	make -C ${software_prefix}/src/openblas/OpenBLAS-0.3.26 clean
+	BINARY64=1 USE_THREAD=0 CC=gcc FC=gfortran NO_CBLAS=1 NO_LAPACKE=1 TARGET=GENERIC make -C ${software_prefix}/src/openblas/OpenBLAS-0.3.26
+	make -C ${software_prefix}/src/openblas/OpenBLAS-0.3.26 PREFIX=${software_prefix}/install/openblas-lp64-sequential  install
 install/openblas/lp64-pthreads:
-	make -C ${software_prefix}/src/openblas/OpenBLAS-0.3.27 clean
-	BINARY64=1 USE_THREAD=1 CC=gcc FC=gfortran NO_CBLAS=1 NO_LAPACKE=1 TARGET=GENERIC make -C ${software_prefix}/src/openblas/OpenBLAS-0.3.27
-	make -C ${software_prefix}/src/openblas/OpenBLAS-0.3.27 PREFIX=${software_prefix}/install/openblas-lp64-pthreads  install
+	make -C ${software_prefix}/src/openblas/OpenBLAS-0.3.26 clean
+	BINARY64=1 USE_THREAD=1 CC=gcc FC=gfortran NO_CBLAS=1 NO_LAPACKE=1 TARGET=GENERIC make -C ${software_prefix}/src/openblas/OpenBLAS-0.3.26
+	make -C ${software_prefix}/src/openblas/OpenBLAS-0.3.26 PREFIX=${software_prefix}/install/openblas-lp64-pthreads  install
 install/openblas/lp64-openmp:
-	make -C ${software_prefix}/src/openblas/OpenBLAS-0.3.27 clean
-	BINARY64=1 USE_OPENMP=1 CC=gcc FC=gfortran NO_CBLAS=1 NO_LAPACKE=1 TARGET=GENERIC make -C ${software_prefix}/src/openblas/OpenBLAS-0.3.27
-	make -C ${software_prefix}/src/openblas/OpenBLAS-0.3.27 PREFIX=${software_prefix}/install/openblas-lp64-openmp  install
+	make -C ${software_prefix}/src/openblas/OpenBLAS-0.3.26 clean
+	BINARY64=1 USE_OPENMP=1 CC=gcc FC=gfortran NO_CBLAS=1 NO_LAPACKE=1 TARGET=GENERIC make -C ${software_prefix}/src/openblas/OpenBLAS-0.3.26
+	make -C ${software_prefix}/src/openblas/OpenBLAS-0.3.26 PREFIX=${software_prefix}/install/openblas-lp64-openmp  install
 
 install/openblas/ilp64-sequential:
-	make -C ${software_prefix}/src/openblas/OpenBLAS-0.3.27 clean
-	BINARY64=1 INTERFACE64=1 USE_THREAD=0 CC=gcc FC=gfortran NO_CBLAS=1 NO_LAPACKE=1 TARGET=GENERIC make -C ${software_prefix}/src/openblas/OpenBLAS-0.3.27
-	make -C ${software_prefix}/src/openblas/OpenBLAS-0.3.27 PREFIX=${software_prefix}/install/openblas-ilp64-sequential  install
+	make -C ${software_prefix}/src/openblas/OpenBLAS-0.3.26 clean
+	BINARY64=1 INTERFACE64=1 USE_THREAD=0 CC=gcc FC=gfortran NO_CBLAS=1 NO_LAPACKE=1 TARGET=GENERIC make -C ${software_prefix}/src/openblas/OpenBLAS-0.3.26
+	make -C ${software_prefix}/src/openblas/OpenBLAS-0.3.26 PREFIX=${software_prefix}/install/openblas-ilp64-sequential  install
 install/openblas/ilp64-pthreads:
-	make -C ${software_prefix}/src/openblas/OpenBLAS-0.3.27 clean
-	BINARY64=1 INTERFACE64=1 USE_THREAD=1 CC=gcc FC=gfortran NO_CBLAS=1 NO_LAPACKE=1 TARGET=GENERIC make -C ${software_prefix}/src/openblas/OpenBLAS-0.3.27
-	make -C ${software_prefix}/src/openblas/OpenBLAS-0.3.27 PREFIX=${software_prefix}/install/openblas-ilp64-pthreads  install
+	make -C ${software_prefix}/src/openblas/OpenBLAS-0.3.26 clean
+	BINARY64=1 INTERFACE64=1 USE_THREAD=1 CC=gcc FC=gfortran NO_CBLAS=1 NO_LAPACKE=1 TARGET=GENERIC make -C ${software_prefix}/src/openblas/OpenBLAS-0.3.26
+	make -C ${software_prefix}/src/openblas/OpenBLAS-0.3.26 PREFIX=${software_prefix}/install/openblas-ilp64-pthreads  install
 install/openblas/ilp64-openmp:
-	make -C ${software_prefix}/src/openblas/OpenBLAS-0.3.27 clean
-	BINARY64=1 INTERFACE64=1 USE_OPENMP=1 CC=gcc FC=gfortran NO_CBLAS=1 NO_LAPACKE=1 TARGET=GENERIC make -C ${software_prefix}/src/openblas/OpenBLAS-0.3.27
-	make -C ${software_prefix}/src/openblas/OpenBLAS-0.3.27 PREFIX=${software_prefix}/install/openblas-ilp64-openmp  install
+	make -C ${software_prefix}/src/openblas/OpenBLAS-0.3.26 clean
+	BINARY64=1 INTERFACE64=1 USE_OPENMP=1 CC=gcc FC=gfortran NO_CBLAS=1 NO_LAPACKE=1 TARGET=GENERIC make -C ${software_prefix}/src/openblas/OpenBLAS-0.3.26
+	make -C ${software_prefix}/src/openblas/OpenBLAS-0.3.26 PREFIX=${software_prefix}/install/openblas-ilp64-openmp  install
 
 # NETLIB == NETLIB-ScaLAPACK b/c it includes NETLIB-BLAS/LAPACK
 download/netlib:
