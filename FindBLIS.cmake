@@ -34,15 +34,29 @@ endif()
 # check ILP64
 if( BLIS_INCLUDE_DIR )
 
-  try_run( BLIS_USES_LP64
-           BLIS_TEST_COMPILES
-           ${CMAKE_CURRENT_BINARY_DIR}
-    SOURCES ${CMAKE_CURRENT_LIST_DIR}/util/blis_int_size.c
-    CMAKE_FLAGS -DINCLUDE_DIRECTORIES:STRING=${BLIS_INCLUDE_DIR}
-    LINK_LIBRARIES ${BLIS_LIBRARIES}
-    COMPILE_OUTPUT_VARIABLE _blis_idx_compile_output
-    RUN_OUTPUT_VARIABLE     _blis_idx_run_output
-  )
+  
+  check_lang_enabled( "C"   _c_enabled   )
+  check_lang_enabled( "CXX" _cxx_enabled )
+  set(_blis_int_size_src FALSE)
+  if( _c_enabled ) 
+    set(_blis_int_size_src ${CMAKE_CURRENT_LIST_DIR}/util/blis_int_size.c )
+  elseif(_cxx_enabled)
+    set(_blis_int_size_src ${CMAKE_CURRENT_LIST_DIR}/util/blis_int_size.cxx )
+  endif()
+  
+  if( _blis_int_size_src )
+    try_run( BLIS_USES_LP64
+             BLIS_TEST_COMPILES
+             ${CMAKE_CURRENT_BINARY_DIR}
+      SOURCES ${_blis_int_size_src}
+      CMAKE_FLAGS -DINCLUDE_DIRECTORIES:STRING=${BLIS_INCLUDE_DIR}
+      LINK_LIBRARIES ${BLIS_LIBRARIES}
+      COMPILE_OUTPUT_VARIABLE _blis_idx_compile_output
+      RUN_OUTPUT_VARIABLE     _blis_idx_run_output
+    )
+  else()
+    set(BLIS_TEST_COMPILES FALSE)
+  endif()
 
   if( NOT BLIS_TEST_COMPILES )
     if( ${_blis_idx_compile_output} MATCHES "pthread_" )
@@ -60,31 +74,38 @@ if( BLIS_INCLUDE_DIR )
     endif()
   endif()
 
-  try_run( BLIS_USES_LP64
-           BLIS_TEST_COMPILES
-           ${CMAKE_CURRENT_BINARY_DIR}
-    SOURCES ${CMAKE_CURRENT_LIST_DIR}/util/blis_int_size.c
-    CMAKE_FLAGS -DINCLUDE_DIRECTORIES:STRING=${BLIS_INCLUDE_DIR}
-    LINK_LIBRARIES ${BLIS_LIBRARIES}
-    COMPILE_OUTPUT_VARIABLE _blis_idx_compile_output
-    RUN_OUTPUT_VARIABLE     _blis_idx_run_output
-  )
+  if( _blis_int_size_src )
+    try_run( BLIS_USES_LP64
+             BLIS_TEST_COMPILES
+             ${CMAKE_CURRENT_BINARY_DIR}
+      SOURCES ${_blis_int_size_src}
+      CMAKE_FLAGS -DINCLUDE_DIRECTORIES:STRING=${BLIS_INCLUDE_DIR}
+      LINK_LIBRARIES ${BLIS_LIBRARIES}
+      COMPILE_OUTPUT_VARIABLE _blis_idx_compile_output
+      RUN_OUTPUT_VARIABLE     _blis_idx_run_output
+    )
 
+    if( ${BLIS_USES_LP64} EQUAL 0 )
+      set( BLIS_USES_LP64 TRUE )
+    else()
+      set( BLIS_USES_LP64 FALSE )
+    endif()
 
-  if( ${BLIS_USES_LP64} EQUAL 0 )
-    set( BLIS_USES_LP64 TRUE )
+    ## Handle components
+    if( BLIS_USES_LP64 )
+      set( BLIS_ilp64_FOUND FALSE )
+      set( BLIS_lp64_FOUND  TRUE  )
+    else()
+      set( BLIS_ilp64_FOUND TRUE  )
+      set( BLIS_lp64_FOUND  FALSE )
+    endif()
   else()
-    set( BLIS_USES_LP64 FALSE )
+    set(BLIS_USES_LP64 FALSE)
+    set(BLIS_lp64_FOUND  FALSE)
+    set(BLIS_ilp64_FOUND FALSE)
   endif()
 
-  ## Handle components
-  if( BLIS_USES_LP64 )
-    set( BLIS_ilp64_FOUND FALSE )
-    set( BLIS_lp64_FOUND  TRUE  )
-  else()
-    set( BLIS_ilp64_FOUND TRUE  )
-    set( BLIS_lp64_FOUND  FALSE )
-  endif()
+
 
 endif()
 
