@@ -109,6 +109,14 @@ function( copy_meta_data _src _dest )
 
 endfunction()
 
+function( check_lang_enabled _lang _out ) 
+  if( CMAKE_${_lang}_COMPILER )
+    set( ${_out} TRUE PARENT_SCOPE )
+  else()
+    set( ${_out} FALSE PARENT_SCOPE )
+  endif()
+endfunction()
+
 
 function( get_true_target_property _out _target _property )
 
@@ -153,11 +161,28 @@ endfunction()
 
 function( check_function_exists_w_results _libs _func _output _result )
 
+  check_lang_enabled( "C"   _c_enabled   )
+  check_lang_enabled( "CXX" _cxx_enabled )
+  check_lang_enabled( "Fortran" _fortran_enabled )
+
+  set(_func_src_file)
+  if( _c_enabled )
+    set( _func_src_file ${COMMON_UTILITY_CMAKE_FILE_DIR}/func_check.c )
+  elseif( _cxx_enabled )
+    set( _func_src_file ${COMMON_UTILITY_CMAKE_FILE_DIR}/func_check.cxx )
+  elseif( _fortran_enabled )
+    set( _func_src_file ${COMMON_UTILITY_CMAKE_FILE_DIR}/func_check.f )
+  endif()
+
+  if( _func_src_file )
   try_compile( ${_result} ${CMAKE_CURRENT_BINARY_DIR}
-                 SOURCES ${COMMON_UTILITY_CMAKE_FILE_DIR}/func_check.c
+                 SOURCES ${_func_src_file}
                  COMPILE_DEFINITIONS "-DFUNC_NAME=${_func}"
                  LINK_LIBRARIES ${_libs} 
                  OUTPUT_VARIABLE ${_output} )
+  else()
+    set( ${_result} FALSE )
+  endif()
 
   set( ${_output} "${${_output}}" PARENT_SCOPE )
   set( ${_result} "${${_result}}" PARENT_SCOPE )
